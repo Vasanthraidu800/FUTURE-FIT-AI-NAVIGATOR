@@ -1,0 +1,1763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-translate-key="page_title">AI Internship Navigator - Future Fit</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'linkedin-blue': '#0A66C2',
+                        'linkedin-bg': '#F3F2EF',
+                        'linkedin-text-secondary': 'rgba(0, 0, 0, 0.6)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* For chatbot animations */
+        @keyframes slideInUp {
+            from {
+                transform: translateY(100%) scale(0.5);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+        .chat-widget-enter {
+            animation: slideInUp 0.3s ease-out forwards;
+        }
+        .prompt-btn {
+            background-color: #f0f2f5;
+            color: #333;
+            padding: 6px 12px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .prompt-btn:hover {
+            background-color: #e4e6eb;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 220px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -110px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.75rem;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        .tab-btn.active {
+            border-bottom-color: #0A66C2;
+            color: #0A66C2;
+            font-weight: 600;
+        }
+        .recording-indicator {
+            width: 12px;
+            height: 12px;
+            background-color: #ef4444;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+    </style>
+</head>
+<body class="bg-linkedin-bg font-sans">
+
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 lg:px-8">
+            <div class="flex items-center justify-between h-14">
+                <div class="flex items-center space-x-2">
+                    <a href="#" class="flex items-center space-x-2">
+                        <svg class="h-10 w-10 text-gray-800" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 12v1c0 1.1.9 2 2 2v4.93zm2 0V15c0-1.1.9-2 2-2v-1l4.79-1.21c.13.58.21 1.17.21 1.79 0 4.08-3.05 7.44-7 7.93zM12 4c1.09 0 2.09.24 3 .65V7c0 .55-.45 1-1 1h-4c-.55 0-1-.45-1-1V4.65c.91-.41 1.91-.65 3-.65z"/>
+                        </svg>
+                        <span class="font-bold text-lg hidden sm:block" data-translate-key="app_name">Future Fit Navigator</span>
+                    </a>
+                </div>
+                <nav class="flex items-center space-x-4 text-linkedin-text-secondary">
+                    <div class="relative" id="languageMenuContainer">
+                        <button id="languageBtn" class="flex flex-col items-center hover:text-black focus:outline-none">
+                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12,2A10,10,0,0,0,2,12A10,10,0,0,0,12,22A10,10,0,0,0,22,12A10,10,0,0,0,12,2M17.8,15.34C17.2,14.05 16.25,13 15,12.44V12A3,3,0,0,0,12,9A3,3,0,0,0,9,12V12.44C7.75,13 6.8,14.05 6.2,15.34C5.5,16.92 5.25,18.5 5.25,20H6.84C7.06,17.75 8,16 12,16C16,16 16.94,17.75 17.16,20H18.75C18.75,18.5 18.5,16.92 17.8,15.34Z" /></svg>
+                            <span id="currentLanguageText" class="text-xs hidden md:block">Language</span>
+                        </button>
+                        <div id="languageMenu" class="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-xl py-1 hidden">
+                            <ul id="languageList">
+                                <!-- Languages will be populated by JS -->
+                            </ul>
+                             <span class="text-xs text-gray-400 px-4 pt-2 pb-1 block">AI-Powered Translations</span>
+                        </div>
+                    </div>
+                    <a href="#" class="flex flex-col items-center hover:text-black">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3,13H8V21H3V13M3,3H8V11H3V3M10,3H15V7H10V3M10,9H15V21H10V9M17,9H22V15H17V9M17,17H22V21H17V17Z"></path></svg>
+                        <span class="text-xs hidden md:block" data-translate-key="dashboard">Dashboard</span>
+                    </a>
+                    <div class="relative" id="profileMenuContainer">
+                        <img id="profileBtn" src="https://placehold.co/32x32/E0E0E0/333?text=Me" alt="My Profile" class="h-8 w-8 rounded-full cursor-pointer">
+                        <div id="profileMenu" class="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl p-4 hidden text-left">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <img src="https://placehold.co/48x48/E0E0E0/333?text=P" alt="Profile" class="h-12 w-12 rounded-full">
+                                <div>
+                                    <p class="font-bold text-gray-800 text-base">Priya Sharma</p>
+                                    <p class="text-xs text-linkedin-text-secondary">B.Tech, Computer Science</p>
+                                </div>
+                            </div>
+                            <div class="border-t my-2"></div>
+                            <div class="space-y-2 text-sm text-gray-700">
+                                <div class="flex justify-between">
+                                    <span data-translate-key="applied">Internships Applied:</span>
+                                    <span class="font-semibold bg-gray-200 px-2 rounded-full">5</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span data-translate-key="last_score">Last ATS Score:</span>
+                                    <span class="font-semibold text-green-600">85%</span>
+                                </div>
+                            </div>
+                            <div class="border-t my-2"></div>
+                            <a href="#" id="viewProfileBtn" class="block text-center text-sm font-semibold text-linkedin-blue hover:underline py-1" data-translate-key="view_profile">View Full Profile</a>
+                            <a href="#" class="block text-center text-sm font-semibold text-red-600 hover:underline mt-1 py-1" data-translate-key="logout">Logout</a>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto mt-6 px-4 lg:px-8 pb-8">
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h1 class="text-2xl font-bold text-gray-800" data-translate-key="main_title">Find Your Perfect Internship</h1>
+            <p class="text-linkedin-text-secondary mt-1" data-translate-key="sub_title">Tell us your preferences to get AI-powered recommendations.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+                <div>
+                    <label class="text-sm font-semibold text-gray-700" data-translate-key="label_location">Preferred Location</label>
+                    <div class="relative mt-1" id="location-multiselect-container">
+                        <button id="location-multiselect-btn" type="button" class="w-full h-[45px] bg-gray-100 rounded-md px-3 py-2.5 text-md focus:outline-none focus:ring-2 focus:ring-linkedin-blue flex justify-between items-center text-left">
+                            <span id="location-multiselect-text" class="text-gray-500 overflow-hidden whitespace-nowrap" data-translate-key="loc_select_placeholder">Select locations</span>
+                            <svg class="h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                        </button>
+                        <div id="location-multiselect-dropdown" class="absolute hidden mt-1 w-full rounded-md bg-white shadow-lg z-20">
+                            <ul class="max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"></ul>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-sm font-semibold text-gray-700" data-translate-key="label_sector">Sector of Interest</label>
+                     <div class="relative mt-1" id="sector-multiselect-container">
+                        <button id="sector-multiselect-btn" type="button" class="w-full h-[45px] bg-gray-100 rounded-md px-3 py-2.5 text-md focus:outline-none focus:ring-2 focus:ring-linkedin-blue flex justify-between items-center text-left">
+                            <span id="sector-multiselect-text" class="text-gray-500 overflow-hidden whitespace-nowrap" data-translate-key="sec_select_placeholder">Select sectors</span>
+                            <svg class="h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                        </button>
+                        <div id="sector-multiselect-dropdown" class="absolute hidden mt-1 w-full rounded-md bg-white shadow-lg z-20">
+                            <ul class="max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"></ul>
+                        </div>
+                    </div>
+                </div>
+                 <div>
+                    <label for="stipendFilter" class="text-sm font-semibold text-gray-700" data-translate-key="label_stipend">Stipend Preference</label>
+                    <select id="stipendFilter" class="w-full mt-1 bg-gray-100 rounded-md px-3 py-2.5 text-md focus:outline-none focus:ring-2 focus:ring-linkedin-blue h-[45px]">
+                        <option value="any" data-translate-key="stip_any">Any</option>
+                        <option value="paid" data-translate-key="stip_paid">Stipend Only</option>
+                        <option value="unpaid" data-translate-key="stip_unpaid">Unpaid Only</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-sm font-semibold text-gray-700" data-translate-key="label_skill">Skills You Have</label>
+                    <div class="relative mt-1" id="skills-multiselect-container">
+                        <button id="skills-multiselect-btn" type="button" class="w-full h-[45px] bg-gray-100 rounded-md px-3 py-2.5 text-md focus:outline-none focus:ring-2 focus:ring-linkedin-blue flex justify-between items-center text-left">
+                            <span id="skills-multiselect-text" class="text-gray-500 overflow-hidden whitespace-nowrap" data-translate-key="skill_select_placeholder">Select one or more skills</span>
+                            <svg class="h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                        </button>
+                        <div id="skills-multiselect-dropdown" class="absolute hidden mt-1 w-full rounded-md bg-white shadow-lg z-20">
+                            <ul class="max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-5 text-center">
+                 <button id="findBtn" class="bg-linkedin-blue text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition duration-300" data-translate-key="find_btn">Find My Top 5 Internships</button>
+            </div>
+        </div>
+
+        <div class="mt-6 bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-2xl font-bold text-gray-800" data-translate-key="resume_tools_title">AI Resume Tools</h2>
+            <p class="text-linkedin-text-secondary mt-1" data-translate-key="resume_tools_subtitle">Analyze your resume against job descriptions or build a new one with AI assistance.</p>
+
+            <div class="border-b border-gray-200 mt-4">
+                <nav class="-mb-px flex space-x-8" id="resume-tool-tabs">
+                    <button class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm active text-linkedin-blue font-semibold" data-tab="analyzer" data-translate-key="analyzer_tab">Resume Analyzer</button>
+                    <button class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300" data-tab="brandBuilder" data-translate-key="brand_builder_tab">Professional Brand Builder</button>
+                </nav>
+            </div>
+
+            <div id="analyzerContent" class="mt-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="text-sm font-semibold text-gray-700" data-translate-key="ats_resume_label">Upload Your Resume (PDF)</label>
+                        <div id="resume-drop-zone" class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md transition-colors">
+                            <div class="space-y-1 text-center">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                </svg>
+                                <div class="flex text-sm text-gray-600">
+                                    <label for="resumeFile" class="relative cursor-pointer bg-white rounded-md font-medium text-linkedin-blue hover:text-blue-700 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-linkedin-blue">
+                                        <span data-translate-key="upload_a_file">Upload a file</span>
+                                        <input id="resumeFile" name="resumeFile" type="file" class="sr-only" accept="application/pdf">
+                                    </label>
+                                    <p class="pl-1" data-translate-key="or_drag_drop">or drag and drop</p>
+                                </div>
+                                <p class="text-xs text-gray-500" id="fileName" data-translate-key="pdf_up_to_10mb">PDF up to 10MB</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="jobDescription" class="text-sm font-semibold text-gray-700" data-translate-key="ats_desc_label">Internship Description</label>
+                        <textarea id="jobDescription" rows="10" class="w-full mt-1 bg-gray-100 rounded-md p-3 text-sm focus:outline-none focus:ring-2 focus:ring-linkedin-blue" data-translate-key="ats_desc_placeholder" placeholder="Paste the internship description here..."></textarea>
+                    </div>
+                </div>
+                <div class="mt-5 text-center">
+                         <button id="analyzeBtn" class="bg-green-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-green-700 transition duration-300 flex items-center justify-center w-60 mx-auto">
+                            <span data-translate-key="analyze_btn">Analyze & Get Score</span>
+                        </button>
+                </div>
+                <div id="atsResult" class="mt-6 border-t pt-4 hidden"></div>
+            </div>
+
+            <div id="brandBuilderContent" class="hidden mt-4">
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="brandBuilderInput" class="text-sm font-semibold text-gray-700" data-translate-key="developer_input_label">Your Key Points / Draft</label>
+                        <textarea id="brandBuilderInput" rows="10" class="w-full mt-1 bg-gray-100 rounded-md p-3 text-sm focus:outline-none focus:ring-2 focus:ring-linkedin-blue" data-translate-key="developer_input_placeholder" placeholder="e.g., Managed social media accounts for college fest. Increased followers by 20%..."></textarea>
+                         <div class="mt-2 grid grid-cols-2 gap-2">
+                             <button id="brandBuilderResumeBtn" class="bg-gray-200 text-gray-800 font-bold py-2 px-2 rounded-lg hover:bg-gray-300 text-sm" data-translate-key="brand_builder_resume_btn">Improve Resume Points</button>
+                             <button id="brandBuilderLinkedinBtn" class="bg-gray-200 text-gray-800 font-bold py-2 px-2 rounded-lg hover:bg-gray-300 text-sm" data-translate-key="brand_builder_linkedin_btn">Generate LinkedIn Summary</button>
+                         </div>
+                    </div>
+                     <div>
+                        <label class="text-sm font-semibold text-gray-700" data-translate-key="developer_output_label">AI-Powered Result</label>
+                        <div id="developerResult" class="mt-1 w-full h-[260px] bg-gray-50 rounded-md p-3 text-sm border overflow-y-auto relative">
+                             <div id="copySuccess" class="absolute top-2 right-10 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-md hidden">Copied!</div>
+                             <button id="copyResumeBtn" class="absolute top-2 right-2 bg-gray-200 p-1.5 rounded-md hover:bg-gray-300 hidden">
+                                 <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM5 11a1 1 0 100 2h4a1 1 0 100-2H5z" /></svg>
+                             </button>
+                            <div id="developerResultContent" class="whitespace-pre-wrap"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-6">
+            <h2 class="text-xl font-semibold mb-4" data-translate-key="reco_title">Your Top 5 AI-Powered Recommendations</h2>
+            <div class="bg-white rounded-lg shadow-sm">
+                <div id="results-container" class="space-y-2 p-2">
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Modals -->
+    <div id="descriptionModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center p-4 border-b">
+                <div>
+                    <h2 id="modalDescTitle" class="text-xl font-bold text-gray-800"></h2>
+                    <p id="modalDescCompany" class="text-sm text-linkedin-blue font-semibold"></p>
+                </div>
+                <button id="closeDescModalBtn" class="text-gray-500 hover:text-gray-800 text-3xl leading-none">&times;</button>
+            </div>
+            <div id="modalDescContent" class="p-6 overflow-y-auto text-gray-700 text-sm space-y-3"></div>
+        </div>
+    </div>
+
+    <div id="applicationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-[51]">
+        <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-lg">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-800" data-translate-key="form_title">Apply for Internship</h2>
+                    <p id="modalJobTitle" class="text-sm text-linkedin-blue font-semibold"></p>
+                </div>
+                <button id="closeModalBtn" class="text-gray-500 hover:text-gray-800 text-3xl leading-none">&times;</button>
+            </div>
+            <form id="applicationForm">
+                <div class="space-y-4">
+                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                         <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700" data-translate-key="form_name">Full Name</label>
+                            <input type="text" id="name" required class="mt-1 block w-full bg-gray-100 border-transparent rounded-md focus:ring-2 focus:ring-linkedin-blue py-2 px-3">
+                        </div>
+                        <div>
+                            <label for="age" class="block text-sm font-medium text-gray-700" data-translate-key="form_age">Age</label>
+                            <input type="number" id="age" required class="mt-1 block w-full bg-gray-100 border-transparent rounded-md focus:ring-2 focus:ring-linkedin-blue py-2 px-3">
+                        </div>
+                         <div>
+                            <label for="gender" class="block text-sm font-medium text-gray-700" data-translate-key="form_gender">Gender</label>
+                            <select id="gender" required class="mt-1 block w-full bg-gray-100 border-transparent rounded-md focus:ring-2 focus:ring-linkedin-blue py-2 px-3 h-[42px]">
+                                <option data-translate-key="form_male">Male</option>
+                                <option data-translate-key="form_female">Female</option>
+                                <option data-translate-key="form_other">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="percentage" class="block text-sm font-medium text-gray-700" data-translate-key="form_perc">Academic Percentage (%)</label>
+                            <input type="number" id="percentage" step="0.01" required class="mt-1 block w-full bg-gray-100 border-transparent rounded-md focus:ring-2 focus:ring-linkedin-blue py-2 px-3">
+                        </div>
+                    </div>
+
+                    <div>
+                        <button type="button" id="generateCoverLetterBtn" class="w-full bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300 transition duration-300 flex items-center justify-center">
+                           <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M9.434 2.243a1 1 0 011.132 0l6.5 4.499a1 1 0 01-1.132 1.63L16 8.526V13a1 1 0 11-2 0V9.81l-1.928 1.334a1 1 0 11-1.144-1.644l3-2.078a1 1 0 011.144 0l3 2.078a1 1 0 11-1.144 1.644L14 9.81V13a3 3 0 11-6 0V4.526l-.066-.046a1 1 0 01-1.132-1.63l6.5-4.499z" /><path d="M4 6a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zM5 9a1 1 0 000 2h1a1 1 0 100-2H5zM3 9a1 1 0 011-1h.5a1 1 0 110 2H4a1 1 0 01-1-1zM2 12a1 1 0 011-1h1a1 1 0 110 2H3a1 1 0 01-1-1z" /></svg>
+                           <span data-translate-key="generate_cover_letter">Generate Cover Letter with AI</span>
+                        </button>
+                        <textarea id="coverLetter" rows="4" class="hidden w-full mt-2 bg-gray-50 rounded-md p-3 text-sm focus:outline-none focus:ring-2 focus:ring-linkedin-blue" placeholder="Your generated cover letter will appear here..."></textarea>
+                    </div>
+
+                    <div>
+                        <label for="resume" class="block text-sm font-medium text-gray-700" data-translate-key="form_resume">Upload Your Resume</label>
+                        <input type="file" id="resume" required class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-linkedin-blue hover:file:bg-blue-100">
+                    </div>
+                </div>
+                <div class="mt-6 text-right">
+                    <button type="submit" class="bg-linkedin-blue text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-300" data-translate-key="form_submit">Submit Application</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="profileModal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-start justify-center p-4 z-50 overflow-y-auto pt-10">
+        <div class="bg-linkedin-bg rounded-lg shadow-xl w-full max-w-5xl max-h-full overflow-y-auto relative">
+             <button id="closeProfileModalBtn" class="absolute top-3 right-4 text-gray-500 hover:text-gray-800 text-4xl leading-none">&times;</button>
+             <div class="p-4 sm:p-6 lg:p-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="md:col-span-1 space-y-6">
+                        <div class="bg-white rounded-lg shadow-sm p-6 text-center">
+                            <img src="https://placehold.co/128x128/E0E0E0/333?text=P" alt="Profile Picture" class="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-white shadow-md">
+                            <h1 class="text-2xl font-bold text-gray-800">Priya Sharma</h1>
+                            <p class="text-linkedin-text-secondary mt-1">B.Tech, Computer Science</p>
+                            <p class="text-linkedin-text-secondary text-sm mt-1">Bengaluru, KA</p>
+                        </div>
+
+                         <div class="bg-white rounded-lg shadow-sm p-6">
+                             <h2 class="text-lg font-bold text-gray-800 mb-3" data-translate-key="profile_badges_title">My Badges</h2>
+                             <div class="flex flex-wrap gap-3">
+                                 <div class="text-center text-xs">
+                                     <img src="https://placehold.co/64x64/E0E0E0/333?text=ATS" alt="ATS 85% Badge" class="rounded-full">
+                                     <p class="mt-1 font-semibold">ATS Pro</p>
+                                 </div>
+                                 <div class="text-center text-xs">
+                                     <img src="https://placehold.co/64x64/E0E0E0/333?text=PY" alt="Python Badge" class="rounded-full">
+                                     <p class="mt-1 font-semibold">Python Skill</p>
+                                 </div>
+                                 <div class="text-center text-xs">
+                                     <img src="https://placehold.co/64x64/E0E0E0/333?text=R" alt="React Badge" class="rounded-full">
+                                     <p class="mt-1 font-semibold">React Skill</p>
+                                 </div>
+                             </div>
+                         </div>
+
+                         <div class="bg-white rounded-lg shadow-sm p-6">
+                                 <h2 class="text-lg font-bold text-gray-800 mb-3" data-translate-key="profile_mentor_title">Find a Mentor</h2>
+                                 <p class="text-sm text-gray-600 mb-3" data-translate-key="profile_mentor_subtitle">Connect with industry professionals.</p>
+                                 <button class="w-full bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700" data-translate-key="profile_mentor_btn">Match Me</button>
+                         </div>
+                    </div>
+
+                    <div class="md:col-span-2 space-y-6">
+                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                             <div class="bg-white rounded-lg shadow-sm p-4 text-center">
+                                 <p class="text-3xl font-bold text-linkedin-blue">5</p>
+                                 <p class="text-sm font-semibold text-linkedin-text-secondary mt-1" data-translate-key="applied_short">Applied</p>
+                             </div>
+                             <div class="bg-white rounded-lg shadow-sm p-4 text-center">
+                                 <p class="text-3xl font-bold text-green-600">85%</p>
+                                 <p class="text-sm font-semibold text-linkedin-text-secondary mt-1" data-translate-key="last_score_short">Last ATS Score</p>
+                             </div>
+                             <div class="bg-white rounded-lg shadow-sm p-4 text-center">
+                                 <p class="text-3xl font-bold text-gray-800">88.5%</p>
+                                 <p class="text-sm font-semibold text-linkedin-text-secondary mt-1" data-translate-key="academic_perc_short">Academics</p>
+                             </div>
+                         </div>
+
+                        <div class="bg-white rounded-lg shadow-sm">
+                            <h2 class="text-lg font-bold text-gray-800 p-4 border-b" data-translate-key="profile_app_history">Application History</h2>
+                            <div class="divide-y">
+                                <div class="p-4 flex justify-between items-center hover:bg-gray-50">
+                                    <div>
+                                        <p class="font-bold text-linkedin-blue">Frontend Developer Intern</p>
+                                        <p class="text-sm font-medium text-gray-600">Innovate Inc.</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-sm font-semibold">Applied: 10 Sep 2025</p>
+                                        <span class="text-xs font-bold bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full mt-1 inline-block">In Review</span>
+                                    </div>
+                                </div>
+                                <div class="p-4 flex justify-between items-center hover:bg-gray-50">
+                                    <div>
+                                        <p class="font-bold text-linkedin-blue">Data Science Intern</p>
+                                        <p class="text-sm font-medium text-gray-600">Analytics AI</p>
+                                    </div>
+                                     <div class="text-right">
+                                        <p class="text-sm font-semibold">Applied: 08 Sep 2025</p>
+                                        <span class="text-xs font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full mt-1 inline-block">Shortlisted</span>
+                                    </div>
+                                </div>
+                                <div class="p-4 flex justify-between items-center hover:bg-gray-50">
+                                    <div>
+                                        <p class="font-bold text-linkedin-blue">Digital Marketing Intern</p>
+                                        <p class="text-sm font-medium text-gray-600">Creative Solutions</p>
+                                    </div>
+                                     <div class="text-right">
+                                        <p class="text-sm font-semibold">Applied: 05 Sep 2025</p>
+                                        <span class="text-xs font-bold bg-red-100 text-red-800 px-2 py-0.5 rounded-full mt-1 inline-block">Not Selected</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+             </div>
+        </div>
+    </div>
+
+    <!-- AI Mock Interview Modal -->
+    <div id="interviewModal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center p-4 z-[52]">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center p-4 border-b">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-800" data-translate-key="interview_modal_title">AI Interview Dojo</h2>
+                    <p id="interviewModalJobTitle" class="text-sm text-linkedin-blue font-semibold"></p>
+                </div>
+                <button id="closeInterviewModalBtn" class="text-gray-500 hover:text-gray-800 text-3xl leading-none">&times;</button>
+            </div>
+            <div id="interviewContent" class="p-6 overflow-y-auto flex-grow">
+                <div id="interviewInitialScreen" class="text-center">
+                    <p data-translate-key="interview_modal_intro">Get ready! Your personalized interview will begin shortly.</p>
+                    <button id="startInterviewBtn" class="mt-4 bg-green-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-600">Start Interview</button>
+                </div>
+                <div id="interviewActiveScreen" class="hidden">
+                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 h-full">
+                         <div class="md:col-span-2 bg-gray-900 rounded-lg flex flex-col items-center justify-center text-white relative p-4">
+                            <canvas id="audioVisualizer" class="w-full h-24"></canvas>
+                             <div id="interviewQuestionArea" class="text-center my-4 flex-grow flex items-center">
+                                <p class="text-lg md:text-xl font-semibold"></p>
+                             </div>
+                             <div id="liveFeedbackPanel" class="absolute bottom-4 left-4 bg-black bg-opacity-50 p-2 rounded-lg text-xs w-11/12">
+                                 <strong>AI Coach:</strong> <span id="liveFeedbackText">Maintain eye contact and a confident posture.</span>
+                             </div>
+                        </div>
+                         <div class="md:col-span-1 bg-gray-100 rounded-lg p-4 flex flex-col h-full max-h-[500px]">
+                             <h3 class="font-bold mb-2 flex-shrink-0" data-translate-key="transcript_title">Transcript & Notes</h3>
+                             <div class="flex-grow text-sm space-y-3 overflow-y-auto" id="interviewTranscript">
+                                 <!-- Transcript will be populated here -->
+                             </div>
+                             <div id="interviewControls" class="mt-4 flex-shrink-0">
+                                 <button id="recordAnswerBtn" class="bg-blue-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-600 w-full flex items-center justify-center">
+                                     <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7 4a3 3 0 016 0v6a3 3 0 11-6 0V4z" /><path d="M5.5 11.5a.5.5 0 01.5-.5h8a.5.5 0 010 1h-8a.5.5 0 01-.5-.5z" /><path d="M3 9a1 1 0 00-1 1v1a1 1 0 102 0v-1a1 1 0 00-1-1zM17 9a1 1 0 00-1 1v1a1 1 0 102 0v-1a1 1 0 00-1-1z" /></svg>
+                                     <span>Record Answer</span>
+                                </button>
+                                <button id="endInterviewBtn" class="hidden mt-2 bg-red-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-600 w-full">End Interview</button>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Interview Result Modal -->
+    <div id="interviewResultModal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center p-4 z-[53]">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h2 class="text-xl font-bold text-gray-800">Interview Analysis</h2>
+                <button id="closeInterviewResultBtn" class="text-gray-500 hover:text-gray-800 text-3xl leading-none">&times;</button>
+            </div>
+            <div id="interviewResultContent" class="p-6 overflow-y-auto">
+                <!-- Results will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Strategy AI Modal -->
+    <div id="strategyModal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center p-4 z-[53]">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h2 class="text-xl font-bold text-gray-800" data-translate-key="strategy_modal_title">Application Strategy AI</h2>
+                <button id="closeStrategyModalBtn" class="text-gray-500 hover:text-gray-800 text-3xl leading-none">&times;</button>
+            </div>
+            <div class="p-6 overflow-y-auto">
+                <div id="strategyModalContent"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- AI CHATBOT -->
+    <div id="chatbot-container" class="fixed bottom-5 right-5 z-50">
+        <!-- Chatbot toggle button -->
+        <button id="chatbot-toggle-btn" class="bg-linkedin-blue text-white w-16 h-16 rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 transition-transform transform hover:scale-110">
+            <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12,2C6.486,2,2,6.486,2,12s4.486,10,10,10c5.514,0,10-4.486,10-10S17.514,2,12,2z M12,20c-4.411,0-8-3.589-8-8s3.589-8,8-8 s8,3.589,8,8S16.411,20,12,20z"/>
+                <path d="M12,7c-2.757,0-5,2.243-5,5s2.243,5,5,5s5-2.243,5-5S14.757,7,12,7z M12,15c-1.654,0-3-1.346-3-3s1.346-3,3-3s3,1.346,3,3 S13.654,15,12,15z"/>
+            </svg>
+        </button>
+
+        <!-- Chatbot Widget -->
+        <div id="chatbot-widget" class="hidden absolute bottom-20 right-0 w-80 md:w-96 bg-white rounded-xl shadow-2xl border border-gray-200 flex flex-col" style="height: 60vh;">
+            <!-- Header -->
+            <div class="bg-linkedin-blue text-white p-4 rounded-t-xl flex justify-between items-center">
+                <div>
+                    <h3 class="font-bold text-lg" data-translate-key="chatbot_title">AI Career Assistant</h3>
+                    <p class="text-xs opacity-80" data-translate-key="chatbot_subtitle">Ask me anything about your career!</p>
+                </div>
+                <button id="chatbot-close-btn" class="text-white hover:opacity-75 text-2xl leading-none">&times;</button>
+            </div>
+
+            <!-- Messages -->
+            <div id="chatbot-messages" class="flex-1 p-4 overflow-y-auto">
+                <!-- Typing Indicator -->
+                 <div id="typing-indicator" class="hidden flex w-full mb-3 justify-start">
+                     <div class="p-3 rounded-lg max-w-xs text-sm bg-gray-200 text-gray-800 self-start rounded-bl-none">
+                         <div class="flex items-center space-x-1">
+                             <span class="w-2 h-2 bg-gray-500 rounded-full animate-pulse" style="animation-delay: 0s;"></span>
+                             <span class="w-2 h-2 bg-gray-500 rounded-full animate-pulse" style="animation-delay: 0.2s;"></span>
+                             <span class="w-2 h-2 bg-gray-500 rounded-full animate-pulse" style="animation-delay: 0.4s;"></span>
+                         </div>
+                     </div>
+                 </div>
+            </div>
+
+            <!-- Suggested Prompts -->
+            <div id="chatbot-prompts" class="p-2 border-t border-gray-200">
+                <div class="flex flex-wrap gap-2">
+                    <button class="prompt-btn" data-prompt-key="prompt_resume" data-translate-key="prompt_resume">Improve my resume</button>
+                    <button class="prompt-btn" data-prompt-key="prompt_skills" data-translate-key="prompt_skills">Suggest skills</button>
+                    <button class="prompt-btn" data-prompt-key="prompt_ats" data-translate-key="prompt_ats">What is ATS?</button>
+                </div>
+            </div>
+
+            <!-- Input -->
+            <div class="p-3 border-t border-gray-200 bg-gray-50 rounded-b-xl flex items-center">
+                <input type="text" id="chatbot-input" class="flex-1 w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-linkedin-blue" placeholder="Type your message..." data-translate-key="chatbot_placeholder">
+                <button id="chatbot-send-btn" class="ml-3 bg-linkedin-blue text-white rounded-full p-3 hover:bg-blue-700 transition">
+                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // --- TRANSLATION ENGINE & DATA ---
+        const translations = {
+            en: {
+                page_title: 'AI Internship Navigator - Future Fit', app_name: 'Future Fit Navigator', dashboard: 'Dashboard',
+                applied: 'Internships Applied:', last_score: 'Last ATS Score:', view_profile: 'View Full Profile', logout: 'Logout',
+                main_title: 'Find Your Perfect Internship', sub_title: 'Tell us your preferences to get AI-powered recommendations.',
+                label_location: 'Preferred Location', loc_select_placeholder: 'Select locations', loc_remote: 'Remote',
+                label_sector: 'Sector of Interest', sec_select_placeholder: 'Select sectors', sec_it: 'IT & Software', sec_marketing: 'Marketing', sec_finance: 'Finance', sec_health: 'Healthcare',
+                label_stipend: 'Stipend Preference', stip_any: 'Any', stip_paid: 'Stipend Only', stip_unpaid: 'Unpaid Only',
+                label_skill: 'Skills You Have', skill_select_placeholder: 'Select one or more skills', skill_comm: 'Communication',
+                find_btn: 'Find My Top 5 Internships',
+                resume_tools_title: 'AI Resume Tools', resume_tools_subtitle: 'Analyze your resume against job descriptions or build a new one with AI assistance.',
+                analyzer_tab: 'Resume Analyzer', brand_builder_tab: 'Professional Brand Builder',
+                ats_resume_label: 'Upload Your Resume (PDF)',
+                upload_a_file: 'Upload a file', or_drag_drop: 'or drag and drop', pdf_up_to_10mb: 'PDF up to 10MB',
+                ats_desc_label: 'Internship Description', ats_desc_placeholder: 'Paste the internship description here...',
+                analyze_btn: 'Analyze & Get Score', analyzing_btn: 'Analyzing...',
+                developer_input_label: 'Your Key Points / Draft', developer_output_label: 'AI-Powered Result',
+                developer_input_placeholder: 'e.g., Managed social media accounts for college fest. Increased followers by 20%...',
+                brand_builder_resume_btn: 'Improve Resume Points', brand_builder_linkedin_btn: 'Generate LinkedIn Summary',
+                reco_title: 'Your Top 5 AI-Powered Recommendations',
+                form_title: 'Apply for Internship', form_name: 'Full Name', form_age: 'Age', form_gender: 'Gender', form_male: 'Male', form_female: 'Female', form_other: 'Other',
+                form_perc: 'Academic Percentage (%)', form_resume: 'Upload Your Resume', form_submit: 'Submit Application',
+                reco_stipend_prefix: 'Stipend: ', reco_save: 'Save', reco_apply_now: 'Apply Now', reco_match_label: 'Success Score', no_internships_found: 'No matching internships found. Try different filters.',
+                ats_analysis_complete: 'Analysis Complete', ats_match_score: 'Match Score', ats_keywords_found: 'Keywords Found', ats_none: 'None', ats_keywords_missing: 'Keywords Missing', ats_missing_suggestion: 'Consider adding these to your resume if you have the skills.',
+                chatbot_title: "AI Career Assistant", chatbot_subtitle: "Ask me anything about your career!", chatbot_placeholder: "Type your message...",
+                prompt_resume: "Improve my resume", prompt_skills: "Suggest skills", prompt_ats: "What is ATS?",
+                internship_1_title: "Frontend Developer Intern",
+                internship_1_desc: `<h3 class="font-bold text-gray-800 mb-2">About the Internship:</h3><p>Join our dynamic team as a Frontend Developer Intern and work on exciting projects that reach thousands of users. You'll be responsible for developing and maintaining our user-facing web applications using React.js and modern web technologies.</p><h3 class="font-bold text-gray-800 mt-3 mb-2">Responsibilities:</h3><ul class="list-disc list-inside space-y-1"><li>Develop new user-facing features using React.js.</li><li>Build reusable components and front-end libraries for future use.</li><li>Translate designs and wireframes into high-quality code.</li><li>Optimize components for maximum performance across a vast array of web-capable devices and browsers.</li></ul><h3 class="font-bold text-gray-800 mt-3 mb-2">Skills Required:</h3><div class="flex flex-wrap gap-2"><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">React</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">JavaScript</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">CSS</span></div><h3 class="font-bold text-gray-800 mt-3 mb-2">Who can apply:</h3><ul class="list-disc list-inside space-y-1"><li>Students pursuing B.Tech/BE in Computer Science or related fields.</li><li>Strong proficiency in JavaScript, including DOM manipulation and the JavaScript object model.</li><li>Thorough understanding of React.js and its core principles.</li><li>Familiarity with RESTful APIs.</li></ul>`,
+                internship_2_title: "Backend Engineer Intern",
+                internship_2_desc: `<h3 class="font-bold text-gray-800 mb-2">About the Internship:</h3><p>We are looking for a Backend Engineer Intern to join our team in Pune. You will work alongside experienced engineers to design, develop, and maintain the server-side logic of our applications. This is a great opportunity to learn about scalable systems and database management.</p><h3 class="font-bold text-gray-800 mt-3 mb-2">Responsibilities:</h3><ul class="list-disc list-inside space-y-1"><li>Write clean, scalable, and efficient code in Python and Django.</li><li>Design and implement RESTful APIs.</li><li>Work with PostgreSQL and optimize SQL queries for performance.</li><li>Collaborate with frontend developers to integrate user-facing elements.</li></ul><h3 class="font-bold text-gray-800 mt-3 mb-2">Skills Required:</h3><div class="flex flex-wrap gap-2"><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">Python</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">Django</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">SQL</span></div><h3 class="font-bold text-gray-800 mt-3 mb-2">Who can apply:</h3><ul class="list-disc list-inside space-y-1"><li>Available for a full-time in-office internship in Pune.</li><li>Strong understanding of Python and experience with a web framework (Django, Flask).</li><li>Knowledge of relational databases (PostgreSQL, MySQL).</li><li>A passion for building great products and learning new technologies.</li></ul>`,
+                internship_3_title: "Data Science Intern",
+                internship_3_desc: `<h3 class="font-bold text-gray-800 mb-2">About the Internship:</h3><p>Analytics AI is seeking a motivated Data Science Intern to work on real-world machine learning projects. This remote internship offers a chance to gain hands-on experience in data analysis, model building, and data visualization. You'll be part of a team that's passionate about data.</p><h3 class="font-bold text-gray-800 mt-3 mb-2">Responsibilities:</h3><ul class="list-disc list-inside space-y-1"><li>Process, clean, and verify the integrity of data used for analysis.</li><li>Build and deploy machine learning models using Scikit-learn and TensorFlow/PyTorch.</li><li>Perform ad-hoc analysis and present results in a clear manner.</li><li>Create data visualizations to communicate findings.</li></ul><h3 class="font-bold text-gray-800 mt-3 mb-2">Skills Required:</h3><div class="flex flex-wrap gap-2"><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">Python</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">Machine Learning</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">SQL</span></div><h3 class="font-bold text-gray-800 mt-3 mb-2">Who can apply:</h3><ul class="list-disc list-inside space-y-1"><li>Strong programming skills in Python and familiarity with data science libraries (Pandas, NumPy, Scikit-learn).</li><li>Good understanding of machine learning algorithms and statistical concepts.</li><li>Experience with SQL for data extraction.</li><li>Ability to work independently in a remote setting.</li></ul>`,
+                internship_4_title: "Python Developer Intern",
+                internship_4_desc: `<h3 class="font-bold text-gray-800 mt-3 mb-2">Skills Required:</h3><div class="flex flex-wrap gap-2"><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">Python</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">API</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">Flask</span></div><p class="mt-4">Further details for this internship are not available at this time.</p>`,
+                internship_5_title: "Digital Marketing Intern",
+                internship_5_desc: `<h3 class="font-bold text-gray-800 mt-3 mb-2">Skills Required:</h3><div class="flex flex-wrap gap-2"><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">SEO</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">Social Media</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">Communication</span></div><p class="mt-4">Further details for this internship are not available at this time.</p>`,
+                internship_6_title: "Financial Analyst Intern",
+                internship_6_desc: `<h3 class="font-bold text-gray-800 mt-3 mb-2">Skills Required:</h3><div class="flex flex-wrap gap-2"><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">Excel</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">Finance</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">Communication</span></div><p class="mt-4">Further details for this internship are not available at this time.</p>`,
+                internship_7_title: "React Native Developer",
+                internship_7_desc: `<h3 class="font-bold text-gray-800 mt-3 mb-2">Skills Required:</h3><div class="flex flex-wrap gap-2"><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">React</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">JavaScript</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">Mobile</span></div><p class="mt-4">Further details for this internship are not available at this time.</p>`,
+                internship_8_title: "Healthcare Assistant",
+                internship_8_desc: `<h3 class="font-bold text-gray-800 mt-3 mb-2">Skills Required:</h3><div class="flex flex-wrap gap-2"><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">Communication</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">First Aid</span></div><p class="mt-4">Further details for this internship are not available at this time.</p>`,
+                skill_gap_title: "Personalized Skill-Gap Analysis",
+                learning_path_title: "Your Skill Foundry",
+                learning_path_subtitle: "Based on your skill gaps, here is a generated micro-internship project to build experience:",
+                view_course: "View Course",
+                success_score_tooltip: "This score predicts your shortlisting chances based on your profile, skills, and historical data.",
+                practice_interview_btn: "Interview Dojo", strategy_btn: "Strategy AI",
+                generate_cover_letter: "Generate Cover Letter with AI",
+                profile_badges_title: "My Badges",
+                profile_mentor_title: "Find a Mentor",
+                profile_mentor_subtitle: "Connect with industry professionals.",
+                profile_mentor_btn: "Match Me",
+                applied_short: "Applied",
+                last_score_short: "Last ATS Score",
+                academic_perc_short: "Academics",
+                profile_app_history: "Application History",
+                interview_modal_title: "AI Interview Dojo",
+                interview_modal_intro: "Get ready! Your personalized interview will begin shortly.",
+                webcam_placeholder: "Webcam Feed", transcript_title: "Transcript & Notes",
+                interview_modal_end_btn: "End Interview",
+                strategy_modal_title: "Application Strategy AI", what_if_title: "'What-If' Scenario",
+                opportunity_title: "High-Potential Opportunities",
+            },
+            hi: {
+                page_title: 'एआई इंटर्नशिप नेविगेटर - फ्यूचर फिट', app_name: 'फ्यूचर फिट नेविगेटर', dashboard: 'tableau',
+                applied: 'आवेदन की गई इंटर्नशिप:', last_score: 'अंतिम एटीएस स्कोर:', view_profile: 'पूरी प्रोफ़ाइल देखें', logout: 'लॉग आउट',
+                main_title: 'अपनी उत्तम इंटर्नशिप खोजें', sub_title: 'एआई-संचालित सिफारिशें प्राप्त करने के लिए हमें अपनी प्राथमिकताएं बताएं।',
+                label_location: 'पसंदीदा स्थान', loc_select_placeholder: 'स्थान चुनें', loc_remote: 'दूरस्थ',
+                label_sector: 'रुचि का क्षेत्र', sec_select_placeholder: 'क्षेत्र चुनें', sec_it: 'आईटी और सॉफ्टवेयर', sec_marketing: 'विपणन', sec_finance: 'वित्त', sec_health: 'स्वास्थ्य सेवा',
+                label_stipend: 'वजीफा वरीयता', stip_any: 'कोई भी', stip_paid: 'केवल वजीफा', stip_unpaid: 'केवल अवैतनिक',
+                label_skill: 'आपके कौशल', skill_select_placeholder: 'एक या अधिक कौशल चुनें', skill_comm: 'संचार',
+                find_btn: 'मेरी शीर्ष 5 इंटर्नशिप खोजें',
+                resume_tools_title: 'एआई बायोडाटा उपकरण', resume_tools_subtitle: 'नौकरी विवरण के विरुद्ध अपने बायोडाटा का विश्लेषण करें या एआई सहायता से एक नया बनाएं।',
+                analyzer_tab: 'बायोडाटा विश्लेषक', brand_builder_tab: 'प्रोफेशनल ब्रांड बिल्डर',
+                ats_resume_label: 'अपना बायोडाटा अपलोड करें (पीडीएफ)',
+                upload_a_file: 'एक फ़ाइल अपलोड करें', or_drag_drop: 'या खींचें और छोड़ें', pdf_up_to_10mb: 'पीडीएफ 10MB तक',
+                ats_desc_label: 'इंटर्नशिप विवरण', ats_desc_placeholder: 'इंटर्नशिप विवरण यहाँ चिपकाएँ...',
+                analyze_btn: 'विश्लेषण करें और स्कोर प्राप्त करें', analyzing_btn: 'विश्लेषण हो रहा है...',
+                developer_input_label: 'अपनी बायोडाटा सामग्री या मुख्य बिंदु चिपकाएँ', developer_output_label: 'एआई-संचालित परिणाम',
+                developer_input_placeholder: 'उदा., कॉलेज उत्सव के लिए सोशल मीडिया खाते प्रबंधित किए। अनुयायियों में 20% की वृद्धि हुई...',
+                brand_builder_resume_btn: 'बायोडाटा सुधारें', brand_builder_linkedin_btn: 'लिंक्डइन सारांश बनाएं',
+                reco_title: 'आपकी शीर्ष 5 एआई-संचालित सिफारिशें',
+                form_title: 'इंटर्नशिप के लिए आवेदन करें', form_name: 'पूरा नाम', form_age: 'आयु', form_gender: 'लिंग', form_male: 'पुरुष', form_female: 'महिला', form_other: 'अन्य',
+                form_perc: 'शैक्षणिक प्रतिशत (%)', form_resume: 'अपना बायोडाटा अपलोड करें', form_submit: 'आवेदन जमा करें',
+                reco_stipend_prefix: 'वजीफा: ', reco_save: 'सहेजें', reco_apply_now: 'अभी आवेदन करें', reco_match_label: 'सफलता स्कोर', no_internships_found: 'कोई मेल खाने वाली इंटर्नशिप नहीं मिली। विभिन्न फ़िल्टर आज़माएँ।',
+                ats_analysis_complete: 'विश्लेषण पूरा हुआ', ats_match_score: 'मैच स्कोर', ats_keywords_found: 'मिले कीवर्ड', ats_none: 'कोई नहीं', ats_keywords_missing: 'लापता कीवर्ड', ats_missing_suggestion: 'यदि आपके पास कौशल है तो इन्हें अपने बायोडाटा में जोड़ने पर विचार करें।',
+                chatbot_title: "एआई करियर सहायक", chatbot_subtitle: "अपने करियर के बारे में कुछ भी पूछें!", chatbot_placeholder: "अपना संदेश टाइप करें...",
+                prompt_resume: "मेरा बायोडाटा सुधारें", prompt_skills: "कौशल सुझाएं", prompt_ats: "एटीएस क्या है?",
+                internship_1_title: "फ्रंटएंड डेवलपर इंटर्न",
+                internship_1_desc: `<h3 class="font-bold text-gray-800 mb-2">इंटर्नशिप के बारे में:</h3><p>हमारी गतिशील टीम में एक फ्रंटएंड डेवलपर इंटर्न के रूप में शामिल हों और उन रोमांचक परियोजनाओं पर काम करें जो हजारों उपयोगकर्ताओं तक पहुँचती हैं। आप React.js और आधुनिक वेब तकनीकों का उपयोग करके हमारे उपयोगकर्ता-सामना करने वाले वेब अनुप्रयोगों को विकसित करने और बनाए रखने के लिए जिम्मेदार होंगे।</p><h3 class="font-bold text-gray-800 mt-3 mb-2">जिम्मेदारियाँ:</h3><ul class="list-disc list-inside space-y-1"><li>React.js का उपयोग करके नई उपयोगकर्ता-सामना करने वाली सुविधाएँ विकसित करें।</li><li>भविष्य में उपयोग के लिए पुन: प्रयोज्य घटक और फ्रंट-एंड लाइब्रेरी बनाएँ।</li><li>डिज़ाइन और वायरफ्रेम को उच्च-गुणवत्ता वाले कोड में अनुवाद करें।</li><li>वेब-सक्षम उपकरणों और ब्राउज़रों की एक विशाल श्रृंखला में अधिकतम प्रदर्शन के लिए घटकों का अनुकूलन करें।</li></ul><h3 class="font-bold text-gray-800 mt-3 mb-2">आवश्यक कौशल:</h3><div class="flex flex-wrap gap-2"><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">React</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">JavaScript</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">CSS</span></div><h3 class="font-bold text-gray-800 mt-3 mb-2">कौन आवेदन कर सकता है:</h3><ul class="list-disc list-inside space-y-1"><li>कंप्यूटर विज्ञान या संबंधित क्षेत्रों में बी.टेक/बीई करने वाले छात्र।</li><li>जावास्क्रिप्ट में मजबूत प्रवीणता, जिसमें DOM हेरफेर और जावास्क्रिप्ट ऑब्जेक्ट मॉडल शामिल है।</li><li>React.js और उसके मूल सिद्धांतों की पूरी समझ।</li><li>RESTful API से परिचित।</li></ul>`,
+                internship_2_title: "बैकएंड इंजीनियर इंटर्न",
+                internship_2_desc: `<h3 class="font-bold text-gray-800 mb-2">इंटर्नशिप के बारे में:</h3><p>हम पुणे में हमारी टीम में शामिल होने के लिए एक बैकएंड इंजीनियर इंटर्न की तलाश कर रहे हैं। आप हमारे अनुप्रयोगों के सर्वर-साइड तर्क को डिजाइन, विकसित और बनाए रखने के लिए अनुभवी इंजीनियरों के साथ काम करेंगे। यह स्केलेबल सिस्टम और डेटाबेस प्रबंधन के बारे में जानने का एक शानदार अवसर है।</p><h3 class="font-bold text-gray-800 mt-3 mb-2">जिम्मेदारियाँ:</h3><ul class="list-disc list-inside space-y-1"><li>पायथन और Django में स्वच्छ, स्केलेबल और कुशल कोड लिखें।</li><li>RESTful API डिजाइन और कार्यान्वित करें।</li><li>PostgreSQL के साथ काम करें और प्रदर्शन के लिए SQL प्रश्नों का अनुकूलन करें।</li><li>उपयोगकर्ता-सामना करने वाले तत्वों को एकीकृत करने के लिए फ्रंटएंड डेवलपर्स के साथ सहयोग करें।</li></ul><h3 class="font-bold text-gray-800 mt-3 mb-2">आवश्यक कौशल:</h3><div class="flex flex-wrap gap-2"><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">Python</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">Django</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">SQL</span></div><h3 class="font-bold text-gray-800 mt-3 mb-2">कौन आवेदन कर सकता है:</h3><ul class="list-disc list-inside space-y-1"><li>पुणे में पूर्णकालिक इन-ऑफिस इंटर्नशिप के लिए उपलब्ध।</li><li>पायथन की मजबूत समझ और एक वेब फ्रेमवर्क (Django, Flask) के साथ अनुभव।</li><li>संबंधपरक डेटाबेस (PostgreSQL, MySQL) का ज्ञान।</li><li>शानदार उत्पाद बनाने और नई तकनीकें सीखने का जुनून।</li></ul>`,
+                internship_3_title: "डेटा साइंस इंटर्न",
+                internship_3_desc: `<h3 class="font-bold text-gray-800 mb-2">इंटर्नशिप के बारे में:</h3><p>एनालिटिक्स एआई वास्तविक दुनिया की मशीन लर्निंग परियोजनाओं पर काम करने के लिए एक प्रेरित डेटा साइंस इंटर्न की तलाश कर रहा है। यह दूरस्थ इंटर्नशिप डेटा विश्लेषण, मॉडल निर्माण और डेटा विज़ुअलाइज़ेशन में व्यावहारिक अनुभव प्राप्त करने का मौका प्रदान करती है। आप एक ऐसी टीम का हिस्सा होंगे जो डेटा के प्रति जुनूनी है।</p><h3 class="font-bold text-gray-800 mt-3 mb-2">जिम्मेदारियाँ:</h3><ul class="list-disc list-inside space-y-1"><li>विश्लेषण के लिए उपयोग किए गए डेटा की अखंडता को संसाधित, स्वच्छ और सत्यापित करें।</li><li>Scikit-learn और TensorFlow/PyTorch का उपयोग करके मशीन लर्निंग मॉडल बनाएं और तैनात करें।</li><li>तदर्थ विश्लेषण करें और परिणामों को स्पष्ट तरीके से प्रस्तुत करें।</li><li>निष्कर्षों को संप्रेषित करने के लिए डेटा विज़ुअलाइज़ेशन बनाएं।</li></ul><h3 class="font-bold text-gray-800 mt-3 mb-2">आवश्यक कौशल:</h3><div class="flex flex-wrap gap-2"><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">Python</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">Machine Learning</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">SQL</span></div><h3 class="font-bold text-gray-800 mt-3 mb-2">कौन आवेदन कर सकता है:</h3><ul class="list-disc list-inside space-y-1"><li>पायथन में मजबूत प्रोग्रामिंग कौशल और डेटा साइंस लाइब्रेरी (Pandas, NumPy, Scikit-learn) से परिचित।</li><li>मशीन लर्निंग एल्गोरिदम और सांख्यिकीय अवधारणाओं की अच्छी समझ।</li><li>डेटा निष्कर्षण के लिए SQL के साथ अनुभव।</li><li>दूरस्थ सेटिंग में स्वतंत्र रूप से काम करने की क्षमता।</li></ul>`,
+                internship_4_title: "पायथन डेवलपर इंटर्न",
+                internship_4_desc: `<h3 class="font-bold text-gray-800 mt-3 mb-2">आवश्यक कौशल:</h3><div class="flex flex-wrap gap-2"><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">Python</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">API</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">Flask</span></div><p class="mt-4">इस इंटर्नशिप के लिए अधिक विवरण इस समय उपलब्ध नहीं हैं।</p>`,
+                internship_5_title: "डिजिटल मार्केटिंग इंटर्न",
+                internship_5_desc: `<h3 class="font-bold text-gray-800 mt-3 mb-2">आवश्यक कौशल:</h3><div class="flex flex-wrap gap-2"><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">SEO</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">Social Media</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">Communication</span></div><p class="mt-4">इस इंटर्नशिप के लिए अधिक विवरण इस समय उपलब्ध नहीं हैं।</p>`,
+                internship_6_title: "वित्तीय विश्लेषक इंटर्न",
+                internship_6_desc: `<h3 class="font-bold text-gray-800 mt-3 mb-2">आवश्यक कौशल:</h3><div class="flex flex-wrap gap-2"><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">Excel</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">Finance</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">Communication</span></div><p class="mt-4">इस इंटर्नशिप के लिए अधिक विवरण इस समय उपलब्ध नहीं हैं।</p>`,
+                internship_7_title: "रिएक्ट नेटिव डेवलपर",
+                internship_7_desc: `<h3 class="font-bold text-gray-800 mt-3 mb-2">आवश्यक कौशल:</h3><div class="flex flex-wrap gap-2"><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">React</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">JavaScript</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">Mobile</span></div><p class="mt-4">इस इंटर्नशिप के लिए अधिक विवरण इस समय उपलब्ध नहीं हैं।</p>`,
+                internship_8_title: "स्वास्थ्य सेवा सहायक",
+                internship_8_desc: `<h3 class="font-bold text-gray-800 mt-3 mb-2">आवश्यक कौशल:</h3><div class="flex flex-wrap gap-2"><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">Communication</span><span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">First Aid</span></div><p class="mt-4">इस इंटर्नशिप के लिए अधिक विवरण इस समय उपलब्ध नहीं हैं।</p>`,
+                skill_gap_title: "व्यक्तिगत कौशल-अंतर विश्लेषण",
+                learning_path_title: "आपका कौशल फाउंड्री",
+                learning_path_subtitle: "आपके कौशल अंतराल के आधार पर, यहाँ अनुभव बनाने के लिए एक उत्पन्न माइक्रो-इंटर्नशिप परियोजना है:",
+                view_course: "कोर्स देखें",
+                success_score_tooltip: "यह स्कोर आपकी प्रोफ़ाइल, कौशल और ऐतिहासिक डेटा के आधार पर आपके शॉर्टलिस्ट होने की संभावनाओं की भविष्यवाणी करता है।",
+                practice_interview_btn: "साक्षात्कार डोजो", strategy_btn: "रणनीति एआई",
+                generate_cover_letter: "एआई के साथ कवर लेटर बनाएं",
+                profile_badges_title: "मेरे बैज",
+                profile_mentor_title: "एक मेंटर खोजें",
+                profile_mentor_subtitle: "उद्योग के पेशेवरों से जुड़ें।",
+                profile_mentor_btn: "मुझे मैच करें",
+                applied_short: "आवेदित",
+                last_score_short: "अंतिम एटीएस स्कोर",
+                academic_perc_short: "शैक्षणिक",
+                profile_app_history: "आवेदन इतिहास",
+                interview_modal_title: "एआई मॉक साक्षात्कार",
+                interview_modal_intro: "तैयार हो जाओ! आपका व्यक्तिगत साक्षात्कार शीघ्र ही शुरू होगा।",
+                webcam_placeholder: "वेबकैम फ़ीड", transcript_title: "ट्रांसक्रिप्ट और नोट्स",
+                interview_modal_end_btn: "साक्षात्कार समाप्त करें",
+                strategy_modal_title: "आवेदन रणनीति एआई", what_if_title: "'क्या-अगर' परिदृश्य",
+                opportunity_title: "उच्च-क्षमता वाले अवसर",
+            },
+            bn: { /* Bengali translations would go here */ },
+            ta: { /* Tamil translations would go here */ },
+            te: { /* Telugu translations would go here */ },
+            mr: { /* Marathi translations would go here */ },
+            kn: { /* Kannada translations would go here */ }
+        };
+
+        let currentLanguage = 'en';
+
+        const allInternships = [
+            { id: 1, titleKey: 'internship_1_title', descriptionKey: 'internship_1_desc', company: 'Innovate Inc.', location: 'Bengaluru', sector: 'IT', stipend: '₹20k/month', workStyle: 'In-Office', skills: ['React', 'JavaScript', 'CSS'] },
+            { id: 2, titleKey: 'internship_2_title', descriptionKey: 'internship_2_desc', company: 'DataCorp', location: 'Pune', sector: 'IT', stipend: '₹22k/month', workStyle: 'In-Office', skills: ['Python', 'Django', 'SQL'] },
+            { id: 3, titleKey: 'internship_3_title', descriptionKey: 'internship_3_desc', company: 'Analytics AI', location: 'Hyderabad', sector: 'IT', stipend: 'Unpaid', workStyle: 'Remote', skills: ['Python', 'Machine Learning', 'SQL'] },
+            { id: 4, titleKey: 'internship_4_title', descriptionKey: 'internship_4_desc', company: 'Innovate Inc.', location: 'Bengaluru', sector: 'IT', stipend: '₹20k/month', workStyle: 'Remote', skills: ['Python', 'API', 'Flask'] },
+            { id: 5, titleKey: 'internship_5_title', descriptionKey: 'internship_5_desc', company: 'Creative Solutions', location: 'Mumbai', sector: 'Marketing', stipend: '₹10k/month', workStyle: 'In-Office', skills: ['SEO', 'Social Media', 'Communication'] },
+            { id: 6, titleKey: 'internship_6_title', descriptionKey: 'internship_6_desc', company: 'Money Matters', location: 'Mumbai', sector: 'Finance', stipend: '₹15k/month', workStyle: 'In-Office', skills: ['Excel', 'Finance', 'Communication'] },
+            { id: 7, titleKey: 'internship_7_title', descriptionKey: 'internship_7_desc', company: 'Appify', location: 'Remote', sector: 'IT', stipend: '₹25k/month', workStyle: 'Remote', skills: ['React', 'JavaScript', 'Mobile'] },
+            { id: 8, titleKey: 'internship_8_title', descriptionKey: 'internship_8_desc', company: 'City Hospital', location: 'Pune', sector: 'Healthcare', stipend: '₹8k/month', workStyle: 'In-Office', skills: ['Communication', 'First Aid'] },
+        ];
+        
+        // --- DOM ELEMENT REFERENCES ---
+        const stipendFilter = document.getElementById('stipendFilter');
+        const findBtn = document.getElementById('findBtn');
+        const resultsContainer = document.getElementById('results-container');
+        const applicationModal = document.getElementById('applicationModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const modalJobTitle = document.getElementById('modalJobTitle');
+        const descriptionModal = document.getElementById('descriptionModal');
+        const closeDescModalBtn = document.getElementById('closeDescModalBtn');
+        const modalDescTitle = document.getElementById('modalDescTitle');
+        const modalDescCompany = document.getElementById('modalDescCompany');
+        const modalDescContent = document.getElementById('modalDescContent');
+        const applicationForm = document.getElementById('applicationForm');
+        const profileModal = document.getElementById('profileModal');
+        const viewProfileBtn = document.getElementById('viewProfileBtn');
+        const closeProfileModalBtn = document.getElementById('closeProfileModalBtn');
+        const resumeFile = document.getElementById('resumeFile');
+        const fileNameDisplay = document.getElementById('fileName');
+        const resumeDropZone = document.getElementById('resume-drop-zone');
+        const jobDescription = document.getElementById('jobDescription');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const atsResult = document.getElementById('atsResult');
+        const profileBtn = document.getElementById('profileBtn');
+        const profileMenu = document.getElementById('profileMenu');
+        const profileMenuContainer = document.getElementById('profileMenuContainer');
+        const languageMenuContainer = document.getElementById('languageMenuContainer');
+        const languageBtn = document.getElementById('languageBtn');
+        const languageMenu = document.getElementById('languageMenu');
+        const languageList = document.getElementById('languageList');
+        const currentLanguageText = document.getElementById('currentLanguageText');
+        const generateCoverLetterBtn = document.getElementById('generateCoverLetterBtn');
+        const coverLetterTextarea = document.getElementById('coverLetter');
+        const interviewModal = document.getElementById('interviewModal');
+        const closeInterviewModalBtn = document.getElementById('closeInterviewModalBtn');
+        const interviewModalJobTitle = document.getElementById('interviewModalJobTitle');
+        const strategyModal = document.getElementById('strategyModal');
+        const closeStrategyModalBtn = document.getElementById('closeStrategyModalBtn');
+        const resumeToolTabs = document.getElementById('resume-tool-tabs');
+        const analyzerContent = document.getElementById('analyzerContent');
+        const brandBuilderContent = document.getElementById('brandBuilderContent');
+        const brandBuilderInput = document.getElementById('brandBuilderInput');
+        const brandBuilderResumeBtn = document.getElementById('brandBuilderResumeBtn');
+        const brandBuilderLinkedinBtn = document.getElementById('brandBuilderLinkedinBtn');
+        const developerResultContent = document.getElementById('developerResultContent');
+        const copyResumeBtn = document.getElementById('copyResumeBtn');
+
+        // CHATBOT DOM REFERENCES
+        const chatbotToggleBtn = document.getElementById('chatbot-toggle-btn');
+        const chatbotWidget = document.getElementById('chatbot-widget');
+        const chatbotCloseBtn = document.getElementById('chatbot-close-btn');
+        const chatbotMessages = document.getElementById('chatbot-messages');
+        const chatbotInput = document.getElementById('chatbot-input');
+        const chatbotSendBtn = document.getElementById('chatbot-send-btn');
+        const promptButtonsContainer = document.getElementById('chatbot-prompts');
+        const typingIndicator = document.getElementById('typing-indicator');
+
+        // INTERVIEW DOJO DOM REFERENCES
+        const interviewInitialScreen = document.getElementById('interviewInitialScreen');
+        const interviewActiveScreen = document.getElementById('interviewActiveScreen');
+        const startInterviewBtn = document.getElementById('startInterviewBtn');
+        const interviewQuestionArea = document.getElementById('interviewQuestionArea').querySelector('p');
+        const recordAnswerBtn = document.getElementById('recordAnswerBtn');
+        const endInterviewBtn = document.getElementById('endInterviewBtn');
+        const interviewTranscript = document.getElementById('interviewTranscript');
+        const interviewResultModal = document.getElementById('interviewResultModal');
+        const interviewResultContent = document.getElementById('interviewResultContent');
+        const closeInterviewResultBtn = document.getElementById('closeInterviewResultBtn');
+        const audioVisualizerCanvas = document.getElementById('audioVisualizer');
+
+
+        // --- MULTI-SELECT DATA AND STATE ---
+        const availableLocations = ['Bengaluru', 'Pune', 'Hyderabad', 'Mumbai', 'Remote'];
+        let selectedLocations = [];
+
+        const availableSectors = ['IT', 'Marketing', 'Finance', 'Healthcare'];
+        let selectedSectors = [];
+
+        const availableSkills = ['Python', 'JavaScript', 'React', 'SQL', 'Communication'];
+        let selectedSkills = [];
+        
+        // --- INTERVIEW STATE ---
+        let mediaRecorder;
+        let audioChunks = [];
+        let interviewQuestions = [];
+        let currentQuestionIndex = 0;
+        let interviewTranscriptLog = [];
+        let isRecording = false;
+        let audioStream;
+        let audioContext;
+        let analyser;
+        let visualizerFrame;
+
+        // --- TRANSLATION HELPER ---
+        function getTranslation(key) {
+            const lang = translations[currentLanguage];
+            if (lang && lang[key]) {
+                return lang[key];
+            }
+            // Fallback to English
+            return translations.en[key] || key;
+        }
+
+        // --- GENERIC MULTI-SELECT LOGIC ---
+        function setupMultiSelect(config) {
+            const container = document.getElementById(config.containerId);
+            const btn = document.getElementById(config.btnId);
+            const dropdown = document.getElementById(config.dropdownId);
+            const list = dropdown.querySelector('ul');
+            const textSpan = document.getElementById(config.textSpanId);
+
+            function populateDropdown() {
+                list.innerHTML = '';
+                config.options.forEach(option => {
+                    const li = document.createElement('li');
+                    li.className = 'text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-gray-100';
+                    const labelKey = config.translationMap?.[option] || option;
+                    const label = getTranslation(labelKey);
+                    li.innerHTML = `
+                        <div class="flex items-center">
+                            <input id="${config.prefix}-${option}" name="${config.prefix}" type="checkbox" value="${option}" ${config.selected.includes(option) ? 'checked' : ''} class="h-4 w-4 border-gray-300 rounded text-linkedin-blue focus:ring-linkedin-blue">
+                            <label for="${config.prefix}-${option}" class="ml-3 block text-sm font-medium">${label}</label>
+                        </div>`;
+                    list.appendChild(li);
+                });
+            }
+
+            function updateButtonText() {
+                if (config.selected.length === 0) {
+                    textSpan.innerHTML = `<span class="text-gray-500">${getTranslation(config.placeholderKey)}</span>`;
+                } else {
+                    textSpan.innerHTML = config.selected.map(value => {
+                        const labelKey = config.translationMap?.[value] || value;
+                        const label = getTranslation(labelKey);
+                        return `<span class="bg-blue-100 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">${label}</span>`
+                    }).join('');
+                }
+            }
+            
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdown.classList.toggle('hidden');
+            });
+
+            list.addEventListener('change', () => {
+                config.selected.length = 0; // Clear the array
+                const checked = Array.from(list.querySelectorAll('input:checked')).map(el => el.value);
+                config.selected.push(...checked);
+                updateButtonText();
+            });
+
+            // Add these functions to the config object to be called from translatePage
+            config.populate = populateDropdown;
+            config.updateText = updateButtonText;
+
+            populateDropdown();
+            updateButtonText();
+        }
+
+        const multiSelectConfigs = [
+            {
+                containerId: 'location-multiselect-container', btnId: 'location-multiselect-btn', dropdownId: 'location-multiselect-dropdown', textSpanId: 'location-multiselect-text',
+                options: availableLocations, selected: selectedLocations, prefix: 'loc', placeholderKey: 'loc_select_placeholder',
+                translationMap: { 'Remote': 'loc_remote' }
+            },
+            {
+                containerId: 'sector-multiselect-container', btnId: 'sector-multiselect-btn', dropdownId: 'sector-multiselect-dropdown', textSpanId: 'sector-multiselect-text',
+                options: availableSectors, selected: selectedSectors, prefix: 'sec', placeholderKey: 'sec_select_placeholder',
+                translationMap: { 'IT': 'sec_it', 'Marketing': 'sec_marketing', 'Finance': 'sec_finance', 'Healthcare': 'sec_health' }
+            },
+            {
+                containerId: 'skills-multiselect-container', btnId: 'skills-multiselect-btn', dropdownId: 'skills-multiselect-dropdown', textSpanId: 'skills-multiselect-text',
+                options: availableSkills, selected: selectedSkills, prefix: 'skill', placeholderKey: 'skill_select_placeholder',
+                translationMap: { 'Communication': 'skill_comm' }
+            }
+        ];
+        
+        function calculateAndShowRecommendations() {
+            const userPreferences = {
+                locations: selectedLocations,
+                sectors: selectedSectors,
+                skills: selectedSkills,
+                stipend: stipendFilter.value
+            };
+            
+            let filteredInternships = allInternships;
+            if (userPreferences.stipend === 'paid') {
+                filteredInternships = allInternships.filter(job => job.stipend !== 'Unpaid');
+            } else if (userPreferences.stipend === 'unpaid') {
+                filteredInternships = allInternships.filter(job => job.stipend === 'Unpaid');
+            }
+
+            const recommendations = filteredInternships.map(job => {
+                let score = 0;
+                // Location Score
+                if (userPreferences.locations.length === 0) {
+                    score += 10;
+                } else if (userPreferences.locations.includes(job.location) || (userPreferences.locations.includes('Remote') && job.workStyle === 'Remote')) {
+                    score += 40;
+                }
+
+                // Sector Score
+                if (userPreferences.sectors.length === 0) {
+                     score += 10;
+                } else if (userPreferences.sectors.includes(job.sector)) {
+                    score += 30;
+                }
+                
+                // Skills Score
+                if (userPreferences.skills.length > 0) {
+                    let skillMatchCount = 0;
+                    userPreferences.skills.forEach(skill => {
+                        if (job.skills.includes(skill)) {
+                            skillMatchCount++;
+                        }
+                    });
+                    score += Math.min(50, skillMatchCount * 25);
+                }
+
+                return { ...job, score };
+            }).sort((a, b) => b.score - a.score).slice(0, 5);
+            
+            displayRecommendations(recommendations);
+        }
+
+        function displayRecommendations(jobs) {
+            if (jobs.length === 0) {
+                resultsContainer.innerHTML = `<p class="p-4 text-center text-gray-500">${getTranslation('no_internships_found')}</p>`;
+                return;
+            }
+            resultsContainer.innerHTML = jobs.map(job => {
+                const successScore = Math.min(98, job.score + 15); // Simulate a more complex score
+                const title = getTranslation(job.titleKey);
+                return `
+                    <div class="p-3 hover:bg-gray-50 rounded-lg transition-colors border-t first:border-t-0">
+                        <div class="flex items-start space-x-4">
+                            <img src="https://placehold.co/48x48/1D9BF0/FFFFFF?text=${job.company.substring(0,2).toUpperCase()}" alt="${job.company}" class="w-12 h-12 rounded-md mt-1">
+                            <div class="flex-grow">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="font-bold text-linkedin-blue hover:underline cursor-pointer internship-title-btn" data-job-id="${job.id}">${title}</p>
+                                        <p class="text-sm font-medium">${job.company}</p>
+                                    </div>
+                                    <div class="text-center flex-shrink-0 ml-2 tooltip">
+                                        <svg class="h-4 w-4 text-gray-400 inline-block mb-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg>
+                                        <p class="text-sm font-semibold text-green-600">${successScore}%</p>
+                                        <p class="text-xs text-gray-500">${getTranslation('reco_match_label')}</p>
+                                        <span class="tooltiptext">${getTranslation('success_score_tooltip')}</span>
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-linkedin-text-secondary mt-1">
+                                    <div class="flex items-center"><svg class="h-3.5 w-3.5 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9.69 18.933l.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 00.281-.14c.186-.1.4-.22.653-.364.253-.145.556-.315.898-.502.43.242.898.418 1.396.519.297.059.609.076.92.076.312 0 .624-.017.92-.076.498-.101.966-.277 1.396-.519.342.187.645.357.898.502.253.145.467.265.653.364.07.039.136.076.199.11.006.003.012.007.018.008l.006.003.002.001.001.001c.198.086.308.066.308.066s.11-.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 00.281-.14c.186-.1.4-.22.653-.364.253-.145.556-.315.898-.502.342.187.645.357.898.502.253.145.467.265.653.364.214.122.46.257.72.42.001.001.003.001.004.002l.003.002.001.001c.2.086.31.066.31.066s.11-.02.31-.066l.004-.002a.75.75 0 00.007-.004l.007-.004-.002-.001-.006-.003a5.71 5.71 0 00-.281-.14c-.186-.1-.4-.22-.653-.364-.253-.145-.556-.315-.898-.502a6.938 6.938 0 00-1.396-.519c-.297-.06-.609-.076-.92-.076s-.624.016-.92.076a6.938 6.938 0 00-1.396.519c-.342.187-.645.357-.898.502-.253-.145-.467.265-.653.364a5.71 5.71 0 00-.281.14l-.006.003-.002.001v.001a.75.75 0 00-.005.004l-.007.004-.004.002c-.2.086-.31.066-.31.066s-.11.02-.31.066l-.001.001-.003.002-.004.002a.75.75 0 00-.007.004l-.001-.001zM10 1.5a.75.75 0 01.75.75v2.5a.75.75 0 01-1.5 0v-2.5A.75.75 0 0110 1.5zM10 6a.75.75 0 01.75.75v2.5a.75.75 0 01-1.5 0v-2.5A.75.75 0 0110 6zM10 10.5a.75.75 0 01.75.75v2.5a.75.75 0 01-1.5 0v-2.5a.75.75 0 01.75-.75z" clip-rule="evenodd" /></svg><span>${job.location}</span></div>
+                                    <div class="flex items-center"><svg class="h-3.5 w-3.5 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 10.837a1 1 0 00-1.5 0h-5.5a1 1 0 000 2h5.5a1 1 0 001.5 0h2.5a1 1 0 000-2h-2.5z" /><path fill-rule="evenodd" d="M2.503 3.125l.003-.002A4.25 4.25 0 015.25 2h9.5a4.25 4.25 0 012.747 1.123l.003.002.001.001a1.75 1.75 0 011.498 1.637l.001.042v9.382l-.001.042a1.75 1.75 0 01-1.498 1.637l-.002.001-.002.001a4.25 4.25 0 01-2.747 1.123h-9.5a4.25 4.25 0 01-2.747-1.123l-.003-.002-.001-.001a1.75 1.75 0 01-1.498-1.637l-.001-.042V4.804l.001-.042a1.75 1.75 0 011.498-1.637l.002-.001zM5.25 3.5a2.75 2.75 0 00-2.75 2.75v8.5a2.75 2.75 0 002.75 2.75h9.5a2.75 2.75 0 002.75-2.75v-8.5a2.75 2.75 0 00-2.75-2.75h-9.5z" clip-rule="evenodd" /></svg><span>${getTranslation('reco_stipend_prefix')}${job.stipend}</span></div>
+                                    <div class="flex items-center"><svg class="h-3.5 w-3.5 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M8 11.25a3.25 3.25 0 100-6.5 3.25 3.25 0 000 6.5z" /><path fill-rule="evenodd" d="M4.5 9a3.5 3.5 0 117 0 3.5 3.5 0 01-7 0zM12.75 12.5a.75.75 0 000-1.5h-.5a.75.75 0 000 1.5h.5z" clip-rule="evenodd" /><path fill-rule="evenodd" d="M2 13.25c0-1.12.723-2.105 1.75-2.47a.75.75 0 01.93.518c.28 1.107.82 2.15 1.487 3.09a.75.75 0 01-1.165.884A5.048 5.048 0 012 13.25zM18 13.25c0-1.12-.723-2.105-1.75-2.47a.75.75 0 00-.93.518c-.28 1.107-.82 2.15-1.487 3.09a.75.75 0 001.165.884A5.048 5.048 0 0018 13.25z" clip-rule="evenodd" /></svg><span>${job.workStyle}</span></div>
+                                </div>
+                                <div class="mt-3 flex items-center justify-between">
+                                    <div class="flex flex-wrap gap-1">${job.skills.map(skill => `<span class="bg-gray-200 text-gray-700 text-xs px-2 py-0.5 rounded-full">${skill}</span>`).join('')}</div>
+                                    <div class="flex space-x-2 flex-shrink-0 ml-2">
+                                         <button class="strategy-btn text-xs bg-gray-200 text-gray-800 font-bold px-3 py-1 rounded-full hover:bg-gray-300" data-job-id="${job.id}" data-score="${successScore}" data-translate-key="strategy_btn">Strategy AI</button>
+                                         <button class="practice-interview-btn text-xs bg-blue-100 text-blue-800 font-bold px-3 py-1 rounded-full hover:bg-blue-200" data-job-title-key="${job.titleKey}" data-translate-key="practice_interview_btn">Interview Dojo</button>
+                                         <button class="apply-btn text-xs bg-linkedin-blue text-white font-bold px-3 py-1 rounded-full hover:bg-blue-700" data-job-title-key="${job.titleKey}">${getTranslation('reco_apply_now')}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function openApplicationModal(jobTitleKey) {
+            modalJobTitle.textContent = getTranslation(jobTitleKey);
+            applicationModal.classList.remove('hidden');
+        }
+
+        function closeApplicationModal() {
+            applicationModal.classList.add('hidden');
+            applicationForm.reset();
+            coverLetterTextarea.classList.add('hidden');
+        }
+        
+        function openDescriptionModal(jobId) {
+            const job = allInternships.find(j => j.id === parseInt(jobId));
+             if (job) {
+                modalDescTitle.textContent = getTranslation(job.titleKey);
+                modalDescCompany.textContent = job.company;
+                modalDescContent.innerHTML = getTranslation(job.descriptionKey);
+                descriptionModal.classList.remove('hidden');
+            }
+        }
+
+        function closeDescriptionModal() {
+            descriptionModal.classList.add('hidden');
+        }
+
+
+        async function extractTextFromPdf(file) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js`;
+            const fileReader = new FileReader();
+            return new Promise((resolve, reject) => {
+                fileReader.onload = async function() {
+                    const typedarray = new Uint8Array(this.result);
+                    try {
+                        const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                        let fullText = '';
+                        for (let i = 1; i <= pdf.numPages; i++) {
+                            const page = await pdf.getPage(i);
+                            const textContent = await page.getTextContent();
+                            const pageText = textContent.items.map(item => item.str).join(' ');
+                            fullText += pageText + '\n';
+                        }
+                        resolve(fullText);
+                    } catch (error) {
+                        reject(error);
+                    }
+                };
+                fileReader.onerror = reject;
+                fileReader.readAsArrayBuffer(file);
+            });
+        }
+
+        async function analyzeResume() {
+            const file = resumeFile.files[0];
+            const description = jobDescription.value;
+            const descriptionLower = description.toLowerCase();
+            
+            const showErrorModal = (title, message) => {
+                 const existingModal = document.querySelector('.error-modal');
+                 if (existingModal) existingModal.remove();
+                 const modal = document.createElement('div');
+                 modal.className = 'error-modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50';
+                 modal.innerHTML = `
+                      <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm text-center">
+                          <h3 class="text-lg font-bold text-yellow-600 mb-2">${title}</h3>
+                          <p class="text-gray-700 mb-4">${message}</p>
+                          <button onclick="this.closest('.error-modal').remove()" class="bg-linkedin-blue text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">OK</button>
+                      </div>`;
+                 document.body.appendChild(modal);
+            };
+
+            if (!file || !description) {
+                showErrorModal('Missing Information', 'Please upload a resume and paste the job description before analyzing.');
+                return;
+            }
+            if (file.type !== 'application/pdf') {
+                showErrorModal('Invalid File Type', 'Please upload a file in PDF format.');
+                return;
+            }
+
+            const analyzeBtnSpan = analyzeBtn.querySelector('span');
+            const originalBtnText = analyzeBtnSpan.textContent;
+            analyzeBtn.disabled = true;
+            analyzeBtnSpan.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                ${getTranslation('analyzing_btn')}`;
+
+            try {
+                const resumeTextContent = await extractTextFromPdf(file);
+                const resumeLower = resumeTextContent.toLowerCase();
+                
+                // --- MODIFIED LOGIC: Extract skills section from job description ---
+                let skillsText = '';
+                const skillSectionPatterns = [
+                    /(?:skills required|technical skills|required skills|skills?)[\s:]*([\s\S]*?)(?:\n\n\w|responsibilities|who can apply|about the internship|$)/i,
+                    /(?:qualifications|requirements)[\s:]*([\s\S]*?)(?:\n\n\w|responsibilities|who can apply|about the internship|$)/i
+                ];
+
+                let match = null;
+                for (const pattern of skillSectionPatterns) {
+                    match = description.match(pattern);
+                    if (match && match[1] && match[1].trim() !== '') {
+                        skillsText = match[1];
+                        break;
+                    }
+                }
+
+                // Fallback to full description if no specific section is found
+                if (!skillsText) {
+                    skillsText = description;
+                }
+                // --- END OF MODIFIED LOGIC ---
+
+                const skillsTextLower = skillsText.toLowerCase();
+                const stopWords = new Set(['and', 'or', 'the', 'a', 'in', 'on', 'of', 'for', 'with', 'to', 'is', 'as', 'at', 'an', 'job', 'role', 'responsibilities', 'experience', 'required', 'preferred']);
+                const descriptionWords = skillsTextLower.replace(/[^\w\s+#-]/gi, ' ').split(/\s+/);
+                const keywords = [...new Set(descriptionWords.filter(word => word.length > 1 && !stopWords.has(word)))];
+                
+                let foundKeywords = [];
+                let missingKeywords = [];
+                
+                keywords.forEach(keyword => {
+                    if (resumeLower.includes(keyword)) {
+                        foundKeywords.push(keyword);
+                    } else {
+                        missingKeywords.push(keyword);
+                    }
+                });
+                
+                const score = keywords.length > 0 ? Math.round((foundKeywords.length / keywords.length) * 100) : 0;
+                displayAtsResult(score, foundKeywords, missingKeywords);
+
+            } catch (error) {
+                console.error("Error processing PDF:", error);
+                showErrorModal('PDF Error', 'There was a problem reading the PDF file. Please ensure it is not corrupted and try again.');
+            } finally {
+                analyzeBtn.disabled = false;
+                analyzeBtnSpan.textContent = originalBtnText;
+            }
+        }
+
+        function displayAtsResult(score, found, missing) {
+            let scoreColor = 'text-red-600';
+            if (score >= 75) scoreColor = 'text-green-600';
+            else if (score >= 50) scoreColor = 'text-yellow-600';
+
+            // Mock data for skill gap analysis and learning path
+            const skillGap = missing.includes('pandas') ? 'The job requires Pandas for data manipulation, which seems to be missing from your resume.' : 'Your skills align well, but highlighting project experience with REST APIs could strengthen your profile.';
+            const skillFoundryProject = missing.includes('pandas') ? 
+                `<div class="bg-white p-3 rounded-lg border"><h5 class="font-bold text-blue-800">Project: Analyze Sales Data</h5><p class="text-xs mt-1">Use Python and Pandas to analyze a sample sales CSV. Calculate total monthly revenue and identify the top-selling product. This will verify your data analysis skills.</p><button class="text-xs bg-blue-600 text-white font-bold px-3 py-1 rounded-full hover:bg-blue-700 mt-2">Submit Project</button></div>` :
+                `<div class="bg-white p-3 rounded-lg border"><h5 class="font-bold text-blue-800">Project: Weather Dashboard API</h5><p class="text-xs mt-1">Build a simple API endpoint using Flask that fetches data from a third-party weather API and returns it in a structured JSON format. This will verify your REST API skills.</p><button class="text-xs bg-blue-600 text-white font-bold px-3 py-1 rounded-full hover:bg-blue-700 mt-2">Submit Project</button></div>`;
+
+            const resultHTML = `
+                <h3 class="text-xl font-bold text-center">${getTranslation('ats_analysis_complete')}</h3>
+                <div class="text-center my-4">
+                    <p class="text-5xl font-bold ${scoreColor}">${score}%</p>
+                    <p class="text-lg font-semibold text-gray-700">${getTranslation('ats_match_score')}</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-4">
+                    <div class="bg-green-50 p-3 rounded-lg">
+                        <h4 class="font-bold text-green-800 mb-2">${getTranslation('ats_keywords_found')} (${found.length})</h4>
+                        <div class="flex flex-wrap gap-2">
+                            ${found.length > 0 ? found.map(k => `<span class="bg-green-200 text-green-800 text-xs px-2 py-1 rounded-full">${k}</span>`).join('') : `<p class="text-gray-500">${getTranslation('ats_none')}</p>`}
+                        </div>
+                    </div>
+                    <div class="bg-red-50 p-3 rounded-lg">
+                        <h4 class="font-bold text-red-800 mb-2">${getTranslation('ats_keywords_missing')} (${missing.length})</h4>
+                        <p class="text-xs text-gray-600 mb-2">${getTranslation('ats_missing_suggestion')}</p>
+                        <div class="flex flex-wrap gap-2">
+                             ${missing.length > 0 ? missing.map(k => `<span class="bg-red-200 text-red-800 text-xs px-2 py-1 rounded-full">${k}</span>`).join('') : `<p class="text-gray-500">${getTranslation('ats_none')}</p>`}
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 pt-4 border-t">
+                    <h4 class="font-bold text-lg text-gray-800 mb-2" data-translate-key="learning_path_title">${getTranslation('learning_path_title')}</h4>
+                     <p class="text-xs text-gray-600 mb-2" data-translate-key="learning_path_subtitle">${getTranslation('learning_path_subtitle')}</p>
+                     <div class="space-y-2">${skillFoundryProject}</div>
+                </div>
+                `;
+            atsResult.innerHTML = resultHTML;
+            atsResult.classList.remove('hidden');
+        }
+        
+        function openProfileModal() { profileModal.classList.add('flex'); profileModal.classList.remove('hidden'); }
+        function closeProfileModal() { profileModal.classList.add('hidden'); profileModal.classList.remove('flex'); }
+
+        // --- AI API CALL (UPGRADED) ---
+        const systemPrompt = `You are the "Future Fit Navigator," a specialized AI Career Assistant for students in India. Your goal is to provide encouraging, insightful, and actionable advice on finding internships, improving resumes, preparing for interviews, and developing career-relevant skills. Current Date: September 13, 2025. User's Location: India. Your Core Directives: 1. **Be Context-Aware:** Always consider the Indian job market, common educational paths (like B.Tech), and popular locations (Bengaluru, Pune, Hyderabad, etc.). 2. **Be encouraging and friendly:** Use a supportive tone. Start your first message with a warm welcome. 3. **Be Action-Oriented:** Provide specific, concrete steps the user can take. 4. **Promote On-Page Tools:** When relevant, guide the user to the tools available on the webpage. * If they ask about finding internships, tell them to use the filters for location, sector, and skills and click the "Find My Top 5 Internships" button. * If they ask about resume strength or how their resume matches a job, direct them to the "AI Resume Analyzer (ATS Checker)" and explain what ATS is. 5. **Keep Responses Concise:** Aim for clear, easy-to-read paragraphs. Use markdown for lists if it improves clarity. 6. **Answer Everything:** Do your best to answer any career-related question the student asks, going beyond simple pre-defined topics.`;
+
+        async function getAIResponse(userMessage, systemP = systemPrompt, isJson = false) {
+            const apiKey = ""; // This will be provided by the environment
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ role: "user", parts: [{ text: userMessage }] }],
+                systemInstruction: { parts: [{ text: systemP }] },
+            };
+
+            if (isJson) {
+                payload.generationConfig = { responseMimeType: "application/json" };
+            }
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) throw new Error(`API error: ${response.status}`);
+                const result = await response.json();
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (!text) {
+                    return isJson ? "{}" : "I'm sorry, I couldn't process that. Could you try asking in a different way?";
+                }
+                return text;
+            } catch (error) {
+                console.error("Error calling Gemini API:", error);
+                 return isJson ? "{}" : "I'm having a little trouble connecting right now. Please try again in a moment.";
+            }
+        }
+        
+        // --- AI CHATBOT LOGIC (UPGRADED) ---
+        const addMessage = (text, sender) => {
+            const messageElement = document.createElement('div');
+            messageElement.className = `p-3 rounded-lg max-w-xs text-sm ${sender === 'user' ? 'bg-linkedin-blue text-white self-end rounded-br-none' : 'bg-gray-200 text-gray-800 self-start rounded-bl-none'}`;
+            text = text.replace(/^\* (.*$)/gm, '• $1');
+            messageElement.innerText = text;
+            const wrapper = document.createElement('div');
+            wrapper.className = 'flex w-full mb-3 ' + (sender === 'user' ? 'justify-end' : 'justify-start');
+            wrapper.appendChild(messageElement);
+            chatbotMessages.insertBefore(wrapper, typingIndicator);
+            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+        };
+
+        const handleUserMessage = async () => {
+            const message = chatbotInput.value.trim();
+            if (message) {
+                addMessage(message, 'user');
+                chatbotInput.value = '';
+                promptButtonsContainer.classList.add('hidden');
+                typingIndicator.classList.remove('hidden');
+                chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+                const botResponse = await getAIResponse(message);
+                typingIndicator.classList.add('hidden');
+                addMessage(botResponse, 'bot');
+            }
+        };
+
+        chatbotToggleBtn.addEventListener('click', () => {
+            const isHidden = chatbotWidget.classList.contains('hidden');
+            if (isHidden) {
+                chatbotWidget.classList.remove('hidden');
+                chatbotWidget.classList.add('chat-widget-enter');
+                if (chatbotMessages.children.length <= 1) { 
+                    typingIndicator.classList.remove('hidden');
+                    setTimeout(async () => {
+                        const welcomeMessage = await getAIResponse("Hello, introduce yourself briefly as the AI Career Assistant.");
+                        typingIndicator.classList.add('hidden');
+                        addMessage(welcomeMessage, 'bot');
+                        promptButtonsContainer.classList.remove('hidden');
+                    }, 500);
+                }
+            } else {
+                chatbotWidget.classList.add('hidden');
+                chatbotWidget.classList.remove('chat-widget-enter');
+            }
+        });
+
+        chatbotCloseBtn.addEventListener('click', () => {
+            chatbotWidget.classList.add('hidden');
+            chatbotWidget.classList.remove('chat-widget-enter');
+        });
+
+        chatbotSendBtn.addEventListener('click', handleUserMessage);
+        chatbotInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleUserMessage(); });
+
+        promptButtonsContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('prompt-btn')) {
+                const promptText = e.target.textContent;
+                chatbotInput.value = promptText;
+                handleUserMessage();
+            }
+        });
+
+        // --- TRANSLATION LOGIC ---
+        function translatePage(lang) {
+            document.documentElement.lang = lang;
+            document.querySelectorAll('[data-translate-key]').forEach(el => {
+                const key = el.dataset.translateKey;
+                const translation = getTranslation(key);
+                if (el.placeholder) el.placeholder = translation;
+                else el.textContent = translation;
+            });
+            multiSelectConfigs.forEach(config => {
+                config.populate();
+                config.updateText();
+            });
+            calculateAndShowRecommendations(); 
+        }
+        
+        // --- EVENT LISTENERS & INITIALIZATION ---
+        findBtn.addEventListener('click', calculateAndShowRecommendations);
+        analyzeBtn.addEventListener('click', analyzeResume);
+        closeModalBtn.addEventListener('click', closeApplicationModal);
+        applicationModal.addEventListener('click', e => { if (e.target === applicationModal) closeApplicationModal(); });
+        closeDescModalBtn.addEventListener('click', closeDescriptionModal);
+        descriptionModal.addEventListener('click', e => { if (e.target === descriptionModal) closeDescriptionModal(); });
+
+        applicationForm.addEventListener('submit', e => {
+            e.preventDefault(); 
+            const existingModal = document.querySelector('.success-modal');
+            if (existingModal) existingModal.remove();
+            const modal = document.createElement('div');
+            modal.className = 'success-modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[60]';
+            modal.innerHTML = `
+                <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm text-center">
+                    <h3 class="text-lg font-bold text-green-600 mb-2">Success!</h3>
+                    <p class="text-gray-700 mb-4">Your application was submitted successfully!</p>
+                    <button onclick="this.closest('.success-modal').remove()" class="bg-linkedin-blue text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">Great!</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            closeApplicationModal();
+        });
+
+        viewProfileBtn.addEventListener('click', e => { e.preventDefault(); openProfileModal(); profileMenu.classList.add('hidden'); });
+        closeProfileModalBtn.addEventListener('click', closeProfileModal);
+        profileModal.addEventListener('click', e => { if (e.target === profileModal) closeProfileModal(); });
+        
+        resultsContainer.addEventListener('click', e => {
+            const applyBtn = e.target.closest('.apply-btn');
+            const titleBtn = e.target.closest('.internship-title-btn');
+            const practiceBtn = e.target.closest('.practice-interview-btn');
+            const strategyBtn = e.target.closest('.strategy-btn');
+
+            if (applyBtn) {
+                openApplicationModal(applyBtn.getAttribute('data-job-title-key'));
+            } else if (titleBtn) {
+                openDescriptionModal(titleBtn.getAttribute('data-job-id'));
+            } else if(practiceBtn){
+                openInterviewModal(practiceBtn.getAttribute('data-job-title-key'));
+            } else if(strategyBtn){
+                openStrategyModal(strategyBtn.dataset.jobId, strategyBtn.dataset.score);
+            }
+        });
+
+        profileBtn.addEventListener('click', e => { e.stopPropagation(); profileMenu.classList.toggle('hidden'); });
+        
+        document.addEventListener('click', (e) => {
+             if (!profileMenuContainer.contains(e.target)) {
+                 profileMenu.classList.add('hidden');
+            }
+            multiSelectConfigs.forEach(config => {
+                const container = document.getElementById(config.containerId);
+                if (!container.contains(e.target)) {
+                    document.getElementById(config.dropdownId).classList.add('hidden');
+                }
+            });
+             if (!languageMenuContainer.contains(e.target)) {
+                 languageMenu.classList.add('hidden');
+            }
+        });
+
+        // Drag and Drop for Resume File
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => resumeDropZone.addEventListener(eventName, e => {e.preventDefault(); e.stopPropagation();}, false));
+        ['dragenter', 'dragover'].forEach(eventName => resumeDropZone.addEventListener(eventName, () => resumeDropZone.classList.add('border-linkedin-blue', 'bg-blue-50'), false));
+        ['dragleave', 'drop'].forEach(eventName => resumeDropZone.addEventListener(eventName, () => resumeDropZone.classList.remove('border-linkedin-blue', 'bg-blue-50'), false));
+        resumeDropZone.addEventListener('drop', e => {
+            resumeFile.files = e.dataTransfer.files;
+            const event = new Event('change');
+            resumeFile.dispatchEvent(event);
+        }, false);
+        resumeFile.addEventListener('change', () => {
+            fileNameDisplay.textContent = resumeFile.files.length > 0 ? resumeFile.files[0].name : getTranslation('pdf_up_to_10mb');
+        });
+
+        const languageNames = { 'en': 'English', 'hi': 'हिन्दी', 'bn': 'বাংলা', 'ta': 'தமிழ்', 'te': 'తెలుగు', 'mr': 'मराठी', 'kn': 'ಕನ್ನಡ' };
+
+        languageBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            languageMenu.classList.toggle('hidden');
+        });
+        
+        function populateLanguageDropdown() {
+            languageList.innerHTML = '';
+            currentLanguageText.textContent = languageNames[currentLanguage].split(' ')[0];
+            for (const langCode in languageNames) {
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = '#';
+                a.textContent = languageNames[langCode];
+                a.dataset.lang = langCode;
+                a.className = 'block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100';
+                if (langCode === currentLanguage) a.classList.add('font-bold', 'bg-gray-100');
+                li.appendChild(a);
+                languageList.appendChild(li);
+            }
+        }
+
+        languageList.addEventListener('click', (event) => {
+            event.preventDefault();
+            const target = event.target;
+            if (target.tagName === 'A' && target.dataset.lang) {
+                currentLanguage = target.dataset.lang;
+                translatePage(currentLanguage);
+                languageMenu.classList.add('hidden');
+                populateLanguageDropdown();
+            }
+        });
+
+        // --- New Feature Logic ---
+        resumeToolTabs.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON') {
+                const tab = e.target.dataset.tab;
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('active', 'text-linkedin-blue', 'font-semibold');
+                    btn.classList.add('text-gray-500');
+                });
+                e.target.classList.add('active', 'text-linkedin-blue', 'font-semibold');
+                e.target.classList.remove('text-gray-500');
+
+                if (tab === 'analyzer') {
+                    analyzerContent.classList.remove('hidden');
+                    brandBuilderContent.classList.add('hidden');
+                } else {
+                    analyzerContent.classList.add('hidden');
+                    brandBuilderContent.classList.remove('hidden');
+                }
+            }
+        });
+
+        async function handleBrandBuilder(type) {
+             const userInput = brandBuilderInput.value;
+             if (!userInput.trim()) {
+                 alert('Please paste your content or key points first.');
+                 return;
+             }
+            developerResultContent.textContent = 'Generating...';
+            copyResumeBtn.classList.add('hidden');
+            
+            let prompt;
+            if (type === 'resume') {
+                prompt = `You are an expert resume writer for Indian college students. Rewrite these points into professional, impactful resume bullet points using action verbs and quantifying results where possible: ${userInput}`;
+            } else {
+                prompt = `You are a professional branding expert. Write a compelling and keyword-rich LinkedIn "About" summary for an Indian college student based on these points: ${userInput}`;
+            }
+
+            const developedContent = await getAIResponse(userInput, prompt);
+            developerResultContent.textContent = developedContent;
+            copyResumeBtn.classList.remove('hidden');
+        }
+
+        brandBuilderResumeBtn.addEventListener('click', () => handleBrandBuilder('resume'));
+        brandBuilderLinkedinBtn.addEventListener('click', () => handleBrandBuilder('linkedin'));
+
+        copyResumeBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(developerResultContent.textContent).then(() => {
+                const copySuccess = document.getElementById('copySuccess');
+                copySuccess.classList.remove('hidden');
+                setTimeout(() => {
+                    copySuccess.classList.add('hidden');
+                }, 1500);
+            });
+        });
+
+        generateCoverLetterBtn.addEventListener('click', () => {
+            const btnSpan = generateCoverLetterBtn.querySelector('span');
+            const originalText = btnSpan.textContent;
+            btnSpan.textContent = "Generating...";
+            generateCoverLetterBtn.disabled = true;
+            setTimeout(() => {
+                coverLetterTextarea.classList.remove('hidden');
+                coverLetterTextarea.value = "Dear Hiring Manager,\n\nBased on my skills in Python and React, I am confident I am a strong candidate for this internship. My project experience aligns perfectly with your requirements...\n\nSincerely,\nPriya Sharma";
+                btnSpan.textContent = originalText;
+                generateCoverLetterBtn.disabled = false;
+            }, 1500);
+        });
+
+        // --- INTERVIEW DOJO LOGIC ---
+
+        function openInterviewModal(jobTitleKey) {
+            resetInterviewState();
+            interviewModalJobTitle.textContent = getTranslation(jobTitleKey);
+            interviewModalJobTitle.dataset.jobTitleKey = jobTitleKey; // Store for later
+            interviewModal.classList.remove('hidden');
+            interviewModal.classList.add('flex');
+        }
+
+        function closeInterviewModal() {
+            if (isRecording) {
+                 mediaRecorder.stop();
+            }
+            if (visualizerFrame) {
+                cancelAnimationFrame(visualizerFrame);
+            }
+             if (audioStream) {
+                 audioStream.getTracks().forEach(track => track.stop());
+            }
+            interviewModal.classList.add('hidden');
+            interviewModal.classList.remove('flex');
+        }
+
+        function resetInterviewState() {
+            interviewQuestions = [];
+            currentQuestionIndex = 0;
+            interviewTranscriptLog = [];
+            interviewTranscript.innerHTML = '';
+            interviewInitialScreen.classList.remove('hidden');
+            interviewActiveScreen.classList.add('hidden');
+            endInterviewBtn.classList.add('hidden');
+        }
+
+        async function startInterview() {
+            const jobTitle = interviewModalJobTitle.textContent;
+            startInterviewBtn.textContent = 'Generating questions...';
+            startInterviewBtn.disabled = true;
+
+            const prompt = `You are an expert technical recruiter for the Indian market. Generate 4 concise interview questions for a college student applying for the role of "${jobTitle}". The questions should cover both technical and behavioral aspects. Return the questions as a JSON array of strings. Example: ["Tell me about a project you are proud of.", "Explain a core concept of React."]`;
+
+            try {
+                const responseText = await getAIResponse(prompt, prompt, true);
+                const questions = JSON.parse(responseText);
+                if (!Array.isArray(questions) || questions.length === 0) throw new Error("Invalid response format");
+                interviewQuestions = questions;
+                
+                interviewInitialScreen.classList.add('hidden');
+                interviewActiveScreen.classList.remove('hidden');
+                displayNextQuestion();
+
+            } catch (error) {
+                console.error("Failed to generate interview questions:", error);
+                interviewQuestionArea.textContent = "Sorry, I couldn't generate questions right now. Please try again.";
+                startInterviewBtn.textContent = 'Start Interview';
+                startInterviewBtn.disabled = false;
+            }
+        }
+        
+        function displayNextQuestion() {
+            if (currentQuestionIndex < interviewQuestions.length) {
+                const question = interviewQuestions[currentQuestionIndex];
+                interviewQuestionArea.textContent = question;
+                addTranscriptEntry("AI", question);
+                recordAnswerBtn.disabled = false;
+                recordAnswerBtn.classList.remove('hidden');
+            } else {
+                interviewQuestionArea.textContent = "That's all the questions I have. Click 'End Interview' to see your analysis.";
+                recordAnswerBtn.classList.add('hidden');
+                endInterviewBtn.classList.remove('hidden');
+            }
+        }
+
+        function addTranscriptEntry(speaker, text) {
+             const entry = document.createElement('p');
+             entry.innerHTML = `<strong class="${speaker === 'AI' ? 'text-blue-700' : 'text-gray-800'}">${speaker}:</strong> ${text}`;
+             interviewTranscript.appendChild(entry);
+             interviewTranscript.scrollTop = interviewTranscript.scrollHeight;
+             interviewTranscriptLog.push({speaker, text});
+        }
+        
+        async function handleRecording() {
+            // --- SECURITY CHECK FOR LOCAL FILES ---
+            // The getUserMedia API requires a secure context (https://) or localhost.
+            if (window.location.protocol === 'file:' || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                const showErrorModal = (title, message) => {
+                     const existingModal = document.querySelector('.error-modal');
+                     if (existingModal) existingModal.remove();
+                     const modal = document.createElement('div');
+                     modal.className = 'error-modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[99]'; // Increased z-index
+                     modal.innerHTML = `
+                         <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md text-center">
+                             <h3 class="text-lg font-bold text-red-600 mb-2">${title}</h3>
+                             <p class="text-gray-700 mb-4 whitespace-pre-line">${message}</p>
+                             <button onclick="this.closest('.error-modal').remove()" class="bg-linkedin-blue text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">Understood</button>
+                         </div>`;
+                     document.body.appendChild(modal);
+                };
+                showErrorModal(
+                    'Microphone Access Required',
+                    'To use the Interview Dojo, your browser needs to access the microphone. This feature only works on a secure connection (https://) or a local server.\n\nRunning from VS Code? Use the "Live Server" extension to fix this.'
+                );
+                return;
+            }
+            // --- END OF SECURITY CHECK ---
+
+            if (isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
+            } else {
+                 try {
+                     audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                     isRecording = true;
+                     recordAnswerBtn.disabled = true; // Disable button immediately
+                     recordAnswerBtn.innerHTML = `<div class="recording-indicator mr-2"></div><span>Recording... (Click to Stop)</span>`;
+                     
+                     // Enable the button again after a short delay to allow stopping
+                     setTimeout(() => { recordAnswerBtn.disabled = false; }, 1000);
+
+                     setupAudioVisualizer();
+
+                     mediaRecorder = new MediaRecorder(audioStream);
+                     audioChunks = [];
+                     mediaRecorder.ondataavailable = event => {
+                         audioChunks.push(event.data);
+                     };
+                     mediaRecorder.onstop = async () => {
+                         recordAnswerBtn.innerHTML = `<span>Analyzing...</span>`;
+                         recordAnswerBtn.disabled = true;
+                         cancelAnimationFrame(visualizerFrame);
+                         
+                         // SIMULATE SPEECH-TO-TEXT AND ANALYSIS
+                         const mockAnswer = "I'm very proud of my e-commerce website project. I used React for the frontend and Node.js for the backend. I learned a lot about state management and API integration. It was a challenging but rewarding experience.";
+                         addTranscriptEntry("You (Mocked)", mockAnswer);
+                         
+                         const analysisPrompt = `You are an interview coach. The candidate was asked: "${interviewQuestions[currentQuestionIndex]}". They answered: "${mockAnswer}". Provide brief, constructive feedback on their answer in 2-3 sentences. Focus on clarity, relevance, and confidence. Start with "Feedback:"`;
+                         const feedback = await getAIResponse(analysisPrompt, analysisPrompt);
+                         addTranscriptEntry("AI Coach", feedback);
+                         
+                         currentQuestionIndex++;
+                         displayNextQuestion();
+                         recordAnswerBtn.innerHTML = `<span>Record Answer</span>`;
+                         recordAnswerBtn.disabled = false;
+                      };
+                     mediaRecorder.start();
+                 } catch (error) {
+                     console.error("Error accessing microphone:", error);
+                     alert("Could not access microphone. Please ensure you have given permission in your browser settings.");
+                     recordAnswerBtn.innerHTML = `<span>Record Answer</span>`;
+                     isRecording = false;
+                 }
+            }
+        }
+        
+        async function finalizeInterview() {
+            closeInterviewModal();
+            interviewResultContent.innerHTML = '<p>Generating your final analysis...</p>';
+            interviewResultModal.classList.add('flex');
+            interviewResultModal.classList.remove('hidden');
+
+            const transcriptText = interviewTranscriptLog.map(e => `${e.speaker}: ${e.text}`).join('\n');
+            const analysisPrompt = `You are an expert interview analyst. Based on the following interview transcript, provide a final analysis. The user is a college student in India. Transcript:\n\n${transcriptText}\n\nYour analysis MUST be a valid JSON object with three keys: 1. "score": an integer out of 100, 2. "summary": a 2-3 paragraph summary of their performance (as a string), highlighting strengths and weaknesses. 3. "suggestions": a bulleted list of 3-4 actionable suggestions for improvement (as a single string with '\\n-' for new lines).`;
+
+            try {
+                const responseText = await getAIResponse(analysisPrompt, analysisPrompt, true);
+                const result = JSON.parse(responseText);
+
+                let scoreColor = 'text-red-600';
+                if (result.score >= 75) scoreColor = 'text-green-600';
+                else if (result.score >= 50) scoreColor = 'text-yellow-600';
+                
+                interviewResultContent.innerHTML = `
+                    <div class="text-center">
+                        <p class="text-5xl font-bold ${scoreColor}">${result.score}/100</p>
+                        <p class="text-lg font-semibold text-gray-700">Overall Score</p>
+                    </div>
+                    <div class="mt-6">
+                        <h4 class="font-bold text-lg text-gray-800 mb-2">Summary</h4>
+                        <p class="text-sm text-gray-700 whitespace-pre-wrap">${result.summary}</p>
+                    </div>
+                    <div class="mt-6">
+                        <h4 class="font-bold text-lg text-gray-800 mb-2">Suggestions for Improvement</h4>
+                        <ul class="list-disc list-inside text-sm text-gray-700 space-y-1">
+                            ${result.suggestions.split('\n-').map(s => `<li>${s.trim()}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            } catch(e) {
+                console.error("Error parsing final analysis", e);
+                interviewResultContent.innerHTML = `<p>Sorry, there was an error generating your final report. Please try again later.</p>`;
+            }
+        }
+        
+        function setupAudioVisualizer() {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            const source = audioContext.createMediaStreamSource(audioStream);
+            source.connect(analyser);
+            analyser.fftSize = 256;
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            const canvasCtx = audioVisualizerCanvas.getContext('2d');
+
+            function draw() {
+                visualizerFrame = requestAnimationFrame(draw);
+                analyser.getByteFrequencyData(dataArray);
+                canvasCtx.fillStyle = '#111827'; // bg-gray-900
+                canvasCtx.fillRect(0, 0, audioVisualizerCanvas.width, audioVisualizerCanvas.height);
+                const barWidth = (audioVisualizerCanvas.width / bufferLength) * 2.5;
+                let barHeight;
+                let x = 0;
+                for (let i = 0; i < bufferLength; i++) {
+                    barHeight = dataArray[i] / 2;
+                    canvasCtx.fillStyle = `rgb(59, 130, 246)`; // text-blue-500
+                    canvasCtx.fillRect(x, audioVisualizerCanvas.height - barHeight, barWidth, barHeight);
+                    x += barWidth + 1;
+                }
+            }
+            draw();
+        }
+
+        startInterviewBtn.addEventListener('click', startInterview);
+        recordAnswerBtn.addEventListener('click', handleRecording);
+        endInterviewBtn.addEventListener('click', finalizeInterview);
+
+        function openStrategyModal(jobId, score) {
+            const job = allInternships.find(j => j.id === parseInt(jobId));
+            if (!job) return;
+
+            const modalContent = document.getElementById('strategyModalContent');
+            const newScore = Math.min(99, parseInt(score) + 15);
+            modalContent.innerHTML = `
+                <h3 class="font-bold text-lg mb-2">${getTranslation('what_if_title')}</h3>
+                <div class="bg-gray-100 p-4 rounded-lg text-center">
+                    <p class="text-sm">Your current score for <span class="font-bold">${getTranslation(job.titleKey)}</span> is <span class="font-bold text-green-600">${score}%</span>.</p>
+                    <p class="mt-2 text-sm">By completing the "Skill Foundry" project for <span class="font-bold">${job.skills[0]}</span>, your predicted score could increase to <span class="font-bold text-green-700">${newScore}%</span>.</p>
+                    <button class="text-xs bg-blue-600 text-white font-bold px-3 py-1 rounded-full hover:bg-blue-700 mt-3">Generate Micro-Internship</button>
+                </div>
+                <h3 class="font-bold text-lg mt-6 mb-2">${getTranslation('opportunity_title')}</h3>
+                <p class="text-sm mb-3">Our AI has identified these roles where you have a high chance of success:</p>
+                <div class="space-y-2">
+                     <div class="bg-white p-3 rounded-lg border">
+                         <p class="font-bold text-linkedin-blue">Jr. Web Developer</p>
+                         <p class="text-xs">Tech Systems Inc. - Remote</p>
+                     </div>
+                    <div class="bg-white p-3 rounded-lg border">
+                        <p class="font-bold text-linkedin-blue">React Trainee</p>
+                        <p class="text-xs">Creative Coders - Bengaluru</p>
+                    </div>
+                </div>
+            `;
+            strategyModal.classList.remove('hidden');
+            strategyModal.classList.add('flex');
+        }
+        function closeStrategyModal() {
+            strategyModal.classList.add('hidden');
+            strategyModal.classList.remove('flex');
+        }
+        
+        closeInterviewModalBtn.addEventListener('click', closeInterviewModal);
+        interviewModal.addEventListener('click', e => { if (e.target === interviewModal) closeInterviewModal(); });
+        closeStrategyModalBtn.addEventListener('click', closeStrategyModal);
+        strategyModal.addEventListener('click', e => { if (e.target === strategyModal) closeStrategyModal(); });
+        closeInterviewResultBtn.addEventListener('click', () => {
+             interviewResultModal.classList.add('hidden');
+             interviewResultModal.classList.remove('flex');
+        });
+        
+        function initializePage() {
+            const userLang = navigator.language || navigator.userLanguage; 
+            const langCode = userLang.split('-')[0];
+            if (translations[langCode] && Object.keys(translations[langCode]).length > 10) { // Check if translation is substantial
+                 currentLanguage = langCode;
+            } else {
+                 currentLanguage = 'en';
+            }
+            
+            multiSelectConfigs.forEach(setupMultiSelect);
+            populateLanguageDropdown();
+            translatePage(currentLanguage);
+        }
+
+        window.addEventListener('load', initializePage);
+    </script>
+</body>
+</html>
+

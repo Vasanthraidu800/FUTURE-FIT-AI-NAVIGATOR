@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Future Fit</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'linkedin-blue': '#0A66C2',
+                        'linkedin-bg': '#F3F2EF',
+                        'linkedin-text-secondary': 'rgba(0, 0, 0, 0.6)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom styles for the toggle switch */
+        input:checked ~ .dot {
+            transform: translateX(100%);
+            background-color: #0A66C2;
+        }
+        input:checked ~ .block {
+            background-color: #93c5fd;
+        }
+    </style>
+</head>
+<body class="bg-linkedin-bg font-sans">
+
+    <!-- Header / Navbar -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 lg:px-8">
+            <div class="flex items-center justify-between h-14">
+                <!-- Left Section: Logo and Title -->
+                <div class="flex items-center space-x-2">
+                    <a href="#" class="flex items-center space-x-2">
+                        <svg class="h-10 w-10 text-gray-800" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 12v1c0 1.1.9 2 2 2v4.93zm2 0V15c0-1.1.9-2 2-2v-1l4.79-1.21c.13.58.21 1.17.21 1.79 0 4.08-3.05 7.44-7 7.93zM12 4c1.09 0 2.09.24 3 .65V7c0 .55-.45 1-1 1h-4c-.55 0-1-.45-1-1V4.65c.91-.41 1.91-.65 3-.65z"/>
+                        </svg>
+                        <span class="font-bold text-lg hidden sm:block">Future Fit Navigator</span>
+                    </a>
+                </div>
+                <!-- Right Section: Admin Info & Logout -->
+                <div class="flex items-center space-x-4">
+                     <p class="font-semibold text-gray-700 hidden sm:block">Admin Panel</p>
+                     <a href="login.html" class="bg-red-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-600 transition duration-300 text-sm">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto mt-6 px-4 lg:px-8 pb-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">Admin Dashboard</h1>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Stat Card 1 -->
+            <div class="bg-white rounded-lg shadow-sm p-6 flex items-center space-x-4">
+                <div class="bg-blue-100 p-3 rounded-full">
+                    <svg class="h-8 w-8 text-linkedin-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                <div>
+                    <p id="totalInternshipsCount" class="text-3xl font-bold text-gray-800">0</p>
+                    <p class="text-sm font-semibold text-linkedin-text-secondary">Total Internships</p>
+                </div>
+            </div>
+            <!-- Stat Card 2 -->
+            <div class="bg-white rounded-lg shadow-sm p-6 flex items-center space-x-4">
+                <div class="bg-green-100 p-3 rounded-full">
+                     <svg class="h-8 w-8 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                </div>
+                <div>
+                    <p id="totalApplicationsCount" class="text-3xl font-bold text-gray-800">0</p>
+                    <p class="text-sm font-semibold text-linkedin-text-secondary">Total Applications</p>
+                </div>
+            </div>
+            <!-- Stat Card 3 -->
+            <div class="bg-white rounded-lg shadow-sm p-6 flex items-center space-x-4">
+                <div class="bg-yellow-100 p-3 rounded-full">
+                    <svg class="h-8 w-8 text-yellow-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                </div>
+                <div>
+                    <p id="registeredStudentsCount" class="text-3xl font-bold text-gray-800">0</p>
+                    <p class="text-sm font-semibold text-linkedin-text-secondary">Registered Students</p>
+                </div>
+            </div>
+             <!-- Stat Card 4 -->
+            <div class="bg-white rounded-lg shadow-sm p-6 flex items-center space-x-4">
+                <div class="bg-indigo-100 p-3 rounded-full">
+                   <svg class="h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                </div>
+                <div>
+                    <p id="totalCompaniesCount" class="text-3xl font-bold text-gray-800">0</p>
+                    <p class="text-sm font-semibold text-linkedin-text-secondary">Companies</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column: Manage & Applications -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Manage Internships Section -->
+                <div class="bg-white rounded-lg shadow-sm">
+                     <div class="p-4 border-b flex justify-between items-center">
+                        <h2 class="text-xl font-bold text-gray-800">Manage Internships</h2>
+                        <button class="bg-linkedin-blue text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300 text-sm">Post New Internship</button>
+                    </div>
+                    <!-- Search Bar Section -->
+                    <div class="p-4 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 border-b">
+                        <div class="relative w-full">
+                            <input type="text" id="searchInput" placeholder="Search by name or Application ID" class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-linkedin-blue focus:border-transparent">
+                            <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        <button id="searchBtn" class="bg-gray-700 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-800 transition duration-300 text-sm flex-shrink-0">Search</button>
+                    </div>
+                    <!-- Search Results Section -->
+                    <div id="searchResults" class="p-4 hidden">
+                        <div id="resultsContent" class="bg-gray-100 rounded-lg p-4 space-y-2">
+                            <!-- Search results will be displayed here -->
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-gray-500">
+                             <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3">Internship Title</th>
+                                    <th scope="col" class="px-6 py-3">Company Name</th>
+                                    <th scope="col" class="px-6 py-3">Total Applications</th>
+                                    <th scope="col" class="px-6 py-3">Selected</th>
+                                    <th scope="col" class="px-6 py-3">Rejected</th>
+                                    <th scope="col" class="px-6 py-3">In Progress</th>
+                                    <th scope="col" class="px-6 py-3">Status</th>
+                                    <th scope="col" class="px-6 py-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="internshipsTableBody">
+                                <!-- Internship rows will be populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+            
+            <!-- Right Column: AI Bot -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">AI Auto-Poster Bot</h2>
+                    <p class="text-sm text-linkedin-text-secondary mb-4">Automatically find and post relevant internships from top job portals.</p>
+                    
+                    <div class="flex items-center space-x-2 mb-6">
+                          <span class="relative flex h-3 w-3">
+                              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                              <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                          </span>
+                        <p class="text-sm font-semibold text-green-700">Active - Last run: 12 minutes ago</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <p class="font-bold text-gray-700">Primary Source:</p>
+                        <!-- PM Internship Scheme Toggle -->
+                        <label for="pm-internship-toggle" class="flex items-center justify-between cursor-pointer">
+                            <span class="text-lg font-medium text-gray-900">PM Internship Scheme</span>
+                            <div class="relative">
+                                <input type="checkbox" id="pm-internship-toggle" class="sr-only" checked>
+                                <div class="block bg-gray-200 w-14 h-8 rounded-full"></div>
+                                <div class="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition"></div>
+                            </div>
+                        </label>
+                        <p class="font-bold text-gray-700">Private Sources:</p>
+                        <!-- LinkedIn Toggle -->
+                        <label for="linkedin-toggle" class="flex items-center justify-between cursor-pointer">
+                            <span class="text-lg font-medium text-gray-900">LinkedIn</span>
+                            <div class="relative">
+                                <input type="checkbox" id="linkedin-toggle" class="sr-only" checked>
+                                <div class="block bg-gray-200 w-14 h-8 rounded-full"></div>
+                                <div class="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition"></div>
+                            </div>
+                        </label>
+                           <!-- Naukri Toggle -->
+                        <label for="naukri-toggle" class="flex items-center justify-between cursor-pointer">
+                            <span class="text-lg font-medium text-gray-900">Naukri.com</span>
+                            <div class="relative">
+                                <input type="checkbox" id="naukri-toggle" class="sr-only" checked>
+                                <div class="block bg-gray-200 w-14 h-8 rounded-full"></div>
+                                <div class="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition"></div>
+                            </div>
+                        </label>
+                           <!-- Internshala Toggle -->
+                        <label for="internshala-toggle" class="flex items-center justify-between cursor-pointer">
+                            <span class="text-lg font-medium text-gray-900">Internshala</span>
+                            <div class="relative">
+                                <input type="checkbox" id="internshala-toggle" class="sr-only">
+                                <div class="block bg-gray-200 w-14 h-8 rounded-full"></div>
+                                <div class="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition"></div>
+                            </div>
+                        </label>
+                           <!-- Indeed Toggle -->
+                        <label for="indeed-toggle" class="flex items-center justify-between cursor-pointer">
+                            <span class="text-lg font-medium text-gray-900">Indeed</span>
+                            <div class="relative">
+                                <input type="checkbox" id="indeed-toggle" class="sr-only">
+                                <div class="block bg-gray-200 w-14 h-8 rounded-full"></div>
+                                <div class="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition"></div>
+                            </div>
+                        </label>
+                           <!-- Glassdoor Toggle -->
+                        <label for="glassdoor-toggle" class="flex items-center justify-between cursor-pointer">
+                            <span class="text-lg font-medium text-gray-900">Glassdoor</span>
+                            <div class="relative">
+                                <input type="checkbox" id="glassdoor-toggle" class="sr-only">
+                                <div class="block bg-gray-200 w-14 h-8 rounded-full"></div>
+                                <div class="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition"></div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <button class="mt-6 w-full bg-gray-700 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-800 transition duration-300 text-sm">Run Bot Now</button>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Application List Modal (Combined) -->
+    <div id="applicationsModal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-start justify-center p-4 z-50 overflow-y-auto pt-10">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-full overflow-y-auto relative my-8 p-6">
+            <button id="closeApplicationsModalBtn" class="absolute top-3 right-4 text-gray-500 hover:text-gray-800 text-4xl leading-none">&times;</button>
+            <h2 id="applicationsModalTitle" class="text-2xl font-bold text-gray-800 mb-2"></h2>
+            <p id="applicationsModalSubtitle" class="text-lg font-semibold text-linkedin-blue mb-4"></p>
+            <div class="overflow-x-auto">
+                 <table class="w-full text-sm text-left text-gray-500">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">Student Name</th>
+                            <th scope="col" class="px-6 py-3">Application ID</th>
+                            <th scope="col" class="px-6 py-3">Applied Date</th>
+                            <th scope="col" class="px-6 py-3">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="applicationsModalTableBody">
+                        <!-- Application rows will be populated by JS -->
+                    </tbody>
+                 </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Internship Description Modal -->
+    <div id="internshipModal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-start justify-center p-4 z-50 overflow-y-auto pt-10">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-full overflow-y-auto relative my-8 p-6">
+            <button id="closeInternshipModalBtn" class="absolute top-3 right-4 text-gray-500 hover:text-gray-800 text-4xl leading-none">&times;</button>
+            <h2 id="modalInternshipTitle" class="text-2xl font-bold text-gray-800 mb-2"></h2>
+            <p id="modalInternshipCompany" class="text-lg font-semibold text-linkedin-blue mb-4"></p>
+            <div id="modalInternshipDescription" class="text-sm text-gray-700 whitespace-pre-wrap"></div>
+        </div>
+    </div>
+
+    <!-- Student Profile Modal -->
+    <div id="profileModal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-start justify-center p-4 z-50 overflow-y-auto pt-10">
+        <div class="bg-linkedin-bg rounded-lg shadow-xl w-full max-w-5xl max-h-full overflow-y-auto relative my-8">
+             <button id="closeProfileModalBtn" class="absolute top-3 right-4 text-gray-500 hover:text-gray-800 text-4xl leading-none">&times;</button>
+             <div class="p-4 sm:p-6 lg:p-8">
+                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                     <!-- Left Column: Profile Summary -->
+                     <div class="md:col-span-1 space-y-6">
+                         <div class="bg-white rounded-lg shadow-sm p-6 text-center">
+                             <img id="modalStudentImage" src="https://placehold.co/128x128/E0E0E0/333?text=S" alt="Profile Picture" class="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-white shadow-md">
+                             <h1 id="modalStudentName" class="text-2xl font-bold text-gray-800">Student Name</h1>
+                             <p class="text-linkedin-text-secondary mt-1">B.Tech, Computer Science</p>
+                         </div>
+                          <div class="bg-white rounded-lg shadow-sm p-6">
+                             <h2 class="text-lg font-bold text-gray-800 mb-3">Key Details</h2>
+                             <div class="space-y-3 text-sm">
+                                 <div class="flex justify-between"><span>Age:</span><span id="modalStudentAge" class="font-semibold"></span></div>
+                                 <div class="flex justify-between"><span>CGPA:</span><span id="modalStudentCGPA" class="font-semibold"></span></div>
+                                 <div class="flex justify-between"><span>ATS Score:</span><span id="modalStudentATS" class="font-semibold"></span></div>
+                                 <div class="flex justify-between"><span>Certifications:</span><span id="modalStudentCerts" class="font-semibold"></span></div>
+                             </div>
+                          </div>
+                     </div>
+                     <!-- Right Column: Resume -->
+                     <div class="md:col-span-2">
+                          <div class="bg-white rounded-lg shadow-sm h-full">
+                               <h2 class="text-lg font-bold text-gray-800 p-4 border-b">Uploaded Resume</h2>
+                               <div id="modalResumeContent" class="p-6 text-sm text-gray-700 overflow-y-auto h-[600px] bg-gray-50 rounded-b-lg whitespace-pre-wrap font-mono">
+                                <!-- Resume text will be injected here -->
+                               </div>
+                          </div>
+                     </div>
+                 </div>
+             </div>
+        </div>
+    </div>
+    <script>
+        // --- MOCK DATA FOR INITIAL POPULATION ---
+        const MOCK_INTERNSHIPS = [
+            { id: '1', title: 'Frontend Developer Intern', company: 'Innovate Inc.', status: 'Open', description: 'Seeking a motivated Frontend Developer Intern to join our team. You will assist in building and maintaining user-facing web applications using React and Tailwind CSS. The ideal candidate has a strong understanding of JavaScript, HTML, and CSS.' },
+            { id: '2', title: 'Data Science Intern', company: 'Analytics AI', status: 'Open', description: 'We are looking for a Data Science Intern to help us analyze large datasets and build predictive models. You will work with Python, SQL, and various machine learning libraries to uncover insights and improve our product.' },
+            { id: '3', title: 'Digital Marketing Intern', company: 'Creative Solutions', status: 'Closed', description: 'Join our marketing team as a Digital Marketing Intern. You will assist with social media campaigns, SEO, content creation, and email marketing. We are looking for someone with a passion for digital trends and a creative mindset.' },
+            { id: '4', title: 'UX/UI Design Intern', company: 'Innovate Inc.', status: 'Open', description: 'An opportunity for a talented UX/UI Design Intern to contribute to our product design process. You will help with user research, wireframing, and creating high-fidelity prototypes. Proficiency in Figma or Sketch is a plus.' },
+            { id: '5', title: 'Backend Software Intern', company: 'Tech Innovators', status: 'Open', description: 'Looking for a Backend Software Intern to work on our core services. You will use Node.js and Express to build and maintain REST APIs, and work with MongoDB for database management. Familiarity with cloud services like AWS is a bonus.' },
+            { id: '6', title: 'Cloud Infrastructure Intern', company: 'Tech Innovators', status: 'Open', description: 'This internship is for a student interested in cloud computing. You will assist our DevOps team with managing infrastructure on AWS, writing scripts for automation, and monitoring system performance.' },
+            { id: '7', title: 'Full Stack Development Intern', company: 'Analytics AI', status: 'Open', description: 'A great opportunity for a Full Stack Development Intern. You will work on both the front end and back end of our applications using the MERN stack. Hands-on experience with React, Node.js, and Express is required.' },
+            { id: '8', title: 'Mobile App Development Intern', company: 'Global Corp', status: 'Closed', description: 'We are seeking a Mobile App Development Intern to assist in building our next-gen mobile application. You will work with a team of experienced developers on either iOS or Android platforms.' },
+            { id: '9', title: 'Cybersecurity Intern', company: 'Tech Innovators', status: 'Open', description: 'An internship focused on cybersecurity. You will help with vulnerability assessments, security audits, and implementing security best practices. A strong interest in network security and cryptography is preferred.' },
+        ];
+
+        const MOCK_STUDENTS = [
+            { id: 'student1', name: 'Rohan Kumar', age: 21, cgpa: 8.5, atsScore: 92, skills: ['Python', 'SQL', 'Machine Learning'], certs: 3, resumeText: `Rohan Kumar\nB.Tech Computer Science\n\n--- Experience ---\nAI Intern at TechCorp (Summer 2024)\n- Developed a recommendation engine using Python and Scikit-learn.\n- Increased user engagement by 15%.\n\n--- Skills ---\n- Python, SQL, Java\n- Machine Learning, Data Analysis\n- Git, Docker` },
+            { id: 'student2', name: 'Anjali Singh', age: 22, cgpa: 9.1, atsScore: 88, skills: ['React', 'JavaScript', 'Node.js'], certs: 5, resumeText: `Anjali Singh\nB.Tech Information Technology\n\n--- Projects ---\nE-commerce Website (MERN Stack)\n- Built a full-stack web application with React, Node.js, and MongoDB.\n- Implemented user authentication and payment gateway integration.\n\n--- Skills ---\n- JavaScript, HTML, CSS\n- React, Node.js, Express\n- REST APIs, GraphQL` },
+            { id: 'student3', name: 'Vikram Reddy', age: 21, cgpa: 7.8, atsScore: 75, skills: ['Marketing', 'SEO', 'Content Writing'], certs: 1, resumeText: `Vikram Reddy\nBBA Marketing\n\n--- Internships ---\nDigital Marketing Intern at Creative Solutions\n- Managed social media campaigns across multiple platforms.\n- Wrote SEO-optimized blog posts that ranked on the first page of Google.\n\n--- Skills ---\n- SEO, SEM, Social Media Marketing\n- Content Strategy, Copywriting\n- Google Analytics` },
+        ];
+
+        const MOCK_APPLICATIONS = [
+            { applicationId: 'APP001', studentId: 'student1', internshipId: '1', status: 'selected', appliedDate: '2025-08-01 10:30 AM' },
+            { applicationId: 'APP002', studentId: 'student2', internshipId: '1', status: 'rejected', appliedDate: '2025-08-02 02:45 PM' },
+            { applicationId: 'APP003', studentId: 'student3', internshipId: '1', status: 'applied', appliedDate: '2025-08-02 03:00 PM' },
+            { applicationId: 'APP004', studentId: 'student1', internshipId: '2', status: 'applied', appliedDate: '2025-08-05 11:15 AM' },
+            { applicationId: 'APP005', studentId: 'student2', internshipId: '2', status: 'selected', appliedDate: '2025-08-06 09:00 AM' },
+            { applicationId: 'APP006', studentId: 'student3', internshipId: '2', status: 'rejected', appliedDate: '2025-08-07 04:20 PM' },
+            { applicationId: 'APP007', studentId: 'student1', internshipId: '3', status: 'rejected', appliedDate: '2025-08-08 08:50 AM' },
+            { applicationId: 'APP008', studentId: 'student2', internshipId: '3', status: 'applied', appliedDate: '2025-08-09 01:00 PM' },
+            { applicationId: 'APP009', studentId: 'student3', internshipId: '3', status: 'selected', appliedDate: '2025-08-10 09:30 AM' },
+            { applicationId: 'APP010', studentId: 'student1', internshipId: '4', status: 'selected', appliedDate: '2025-08-11 02:00 PM' },
+            { applicationId: 'APP011', studentId: 'student2', internshipId: '4', status: 'rejected', appliedDate: '2025-08-12 11:45 AM' },
+            { applicationId: 'APP012', studentId: 'student3', internshipId: '4', status: 'applied', appliedDate: '2025-08-13 10:10 AM' },
+            { applicationId: 'APP013', studentId: 'student1', internshipId: '5', status: 'applied', appliedDate: '2025-08-14 03:30 PM' },
+            { applicationId: 'APP014', studentId: 'student2', internshipId: '5', status: 'selected', appliedDate: '2025-08-15 09:45 AM' },
+            { applicationId: 'APP015', studentId: 'student3', internshipId: '5', status: 'rejected', appliedDate: '2025-08-16 12:00 PM' },
+            { applicationId: 'APP016', studentId: 'student1', internshipId: '6', status: 'rejected', appliedDate: '2025-08-17 04:00 PM' },
+            { applicationId: 'APP017', studentId: 'student2', internshipId: '6', status: 'selected', appliedDate: '2025-08-18 10:00 AM' },
+            { applicationId: 'APP018', studentId: 'student3', internshipId: '6', status: 'applied', appliedDate: '2025-08-19 01:00 PM' },
+            { applicationId: 'APP019', studentId: 'student1', internshipId: '7', status: 'selected', appliedDate: '2025-08-20 02:00 PM' },
+            { applicationId: 'APP020', studentId: 'student2', internshipId: '7', status: 'rejected', appliedDate: '2025-08-21 11:30 AM' },
+            { applicationId: 'APP021', studentId: 'student3', internshipId: '7', status: 'applied', appliedDate: '2025-08-22 09:00 AM' },
+            { applicationId: 'APP022', studentId: 'student1', internshipId: '8', status: 'applied', appliedDate: '2025-08-23 03:00 PM' },
+            { applicationId: 'APP023', studentId: 'student2', internshipId: '8', status: 'selected', appliedDate: '2025-08-24 10:45 AM' },
+            { applicationId: 'APP024', studentId: 'student3', internshipId: '8', status: 'rejected', appliedDate: '2025-08-25 04:30 PM' },
+            { applicationId: 'APP025', studentId: 'student1', internshipId: '9', status: 'selected', appliedDate: '2025-08-26 09:15 AM' },
+            { applicationId: 'APP026', studentId: 'student2', internshipId: '9', status: 'applied', appliedDate: '2025-08-27 12:00 PM' },
+            { applicationId: 'APP027', studentId: 'student3', internshipId: '9', status: 'rejected', appliedDate: '2025-08-28 01:40 PM' },
+        ];
+
+
+        // --- DOM ELEMENTS ---
+        const internshipsTableBody = document.getElementById('internshipsTableBody');
+        const profileModal = document.getElementById('profileModal');
+        const closeProfileModalBtn = document.getElementById('closeProfileModalBtn');
+        const internshipModal = document.getElementById('internshipModal');
+        const closeInternshipModalBtn = document.getElementById('closeInternshipModalBtn');
+        const applicationsModal = document.getElementById('applicationsModal');
+        const closeApplicationsModalBtn = document.getElementById('closeApplicationsModalBtn');
+        const applicationsModalTitle = document.getElementById('applicationsModalTitle');
+        const applicationsModalSubtitle = document.getElementById('applicationsModalSubtitle');
+        const applicationsModalTableBody = document.getElementById('applicationsModalTableBody');
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const searchResults = document.getElementById('searchResults');
+        const resultsContent = document.getElementById('resultsContent');
+        
+        // --- MODAL POPULATION ELEMENTS ---
+        const modalStudentName = document.getElementById('modalStudentName');
+        const modalStudentAge = document.getElementById('modalStudentAge');
+        const modalStudentCGPA = document.getElementById('modalStudentCGPA');
+        const modalStudentATS = document.getElementById('modalStudentATS');
+        const modalStudentCerts = document.getElementById('modalStudentCerts');
+        const modalResumeContent = document.getElementById('modalResumeContent');
+        const modalInternshipTitle = document.getElementById('modalInternshipTitle');
+        const modalInternshipCompany = document.getElementById('modalInternshipCompany');
+        const modalInternshipDescription = document.getElementById('modalInternshipDescription');
+
+        // --- STAT ELEMENTS ---
+        const totalInternshipsCount = document.getElementById('totalInternshipsCount');
+        const totalApplicationsCount = document.getElementById('totalApplicationsCount');
+        const registeredStudentsCount = document.getElementById('registeredStudentsCount');
+        const totalCompaniesCount = document.getElementById('totalCompaniesCount');
+
+        // Internal data storage
+        let internships = MOCK_INTERNSHIPS;
+        let students = MOCK_STUDENTS;
+        let applications = MOCK_APPLICATIONS;
+
+        // --- UI UPDATING FUNCTIONS ---
+        function updateDashboardStats() {
+            const totalInternships = internships.length;
+            const totalApplications = applications.length;
+            const uniqueStudents = new Set(applications.map(app => app.studentId));
+            const totalRegisteredStudents = uniqueStudents.size;
+            const companies = new Set(internships.map(d => d.company));
+            const totalCompanies = companies.size;
+
+            totalInternshipsCount.textContent = totalInternships;
+            totalApplicationsCount.textContent = totalApplications;
+            registeredStudentsCount.textContent = totalRegisteredStudents;
+            totalCompaniesCount.textContent = totalCompanies;
+        }
+
+        function populateInternshipsTable() {
+            internshipsTableBody.innerHTML = '';
+            internships.forEach(internship => {
+                const totalApps = applications.filter(app => app.internshipId === internship.id).length;
+                const selectedApps = applications.filter(app => app.internshipId === internship.id && app.status === 'selected').length;
+                const rejectedApps = applications.filter(app => app.internshipId === internship.id && app.status === 'rejected').length;
+                const inProgressApps = applications.filter(app => app.internshipId === internship.id && app.status === 'applied').length;
+
+                const row = document.createElement('tr');
+                row.className = 'bg-white border-b hover:bg-gray-50';
+                
+                const statusClass = internship.status === 'Open' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+                const statusText = internship.status;
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                        <a href="#" class="font-medium text-linkedin-blue hover:underline view-internship-btn" data-id="${internship.id}">${internship.title}</a>
+                    </td>
+                    <td class="px-6 py-4">${internship.company}</td>
+                    <td class="px-6 py-4 font-semibold text-linkedin-blue cursor-pointer applications-count" data-id="${internship.id}" data-filter="all">${totalApps}</td>
+                    <td class="px-6 py-4 font-semibold text-green-600 cursor-pointer applications-count" data-id="${internship.id}" data-filter="selected">${selectedApps}</td>
+                    <td class="px-6 py-4 font-semibold text-red-600 cursor-pointer applications-count" data-id="${internship.id}" data-filter="rejected">${rejectedApps}</td>
+                    <td class="px-6 py-4 font-semibold text-yellow-600 cursor-pointer applications-count" data-id="${internship.id}" data-filter="applied">${inProgressApps}</td>
+                    <td class="px-6 py-4"><span class="text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full ${statusClass}">${statusText}</span></td>
+                    <td class="px-6 py-4 space-x-2"><a href="#" class="font-medium text-linkedin-blue hover:underline">Edit</a><a href="#" class="font-medium text-red-600 hover:underline">Delete</a></td>
+                `;
+                internshipsTableBody.appendChild(row);
+            });
+        }
+        
+        function handleSearch() {
+            const query = searchInput.value.trim().toLowerCase();
+            let foundApplication = null;
+            let foundStudent = null;
+
+            if (query === '') {
+                resultsContent.innerHTML = '<p class="text-sm text-gray-500">Please enter a name or Application ID to search.</p>';
+                searchResults.classList.remove('hidden');
+                return;
+            }
+
+            // Search by Application ID first
+            foundApplication = applications.find(app => app.applicationId.toLowerCase() === query);
+
+            if (foundApplication) {
+                foundStudent = students.find(s => s.id === foundApplication.studentId);
+            } else {
+                // If not found by ID, search by student name
+                foundStudent = students.find(s => s.name.toLowerCase().includes(query));
+                if (foundStudent) {
+                    foundApplication = applications.find(app => app.studentId === foundStudent.id);
+                }
+            }
+            
+            if (foundStudent && foundApplication) {
+                resultsContent.innerHTML = `
+                    <p class="font-semibold text-gray-800">Application Found:</p>
+                    <p class="text-sm">Name: <span class="font-medium">${foundStudent.name}</span></p>
+                    <p class="text-sm">Application ID: <span class="font-medium">${foundApplication.applicationId}</span></p>
+                    <p class="text-sm">Status: <span class="font-medium capitalize text-${getStatusColor(foundApplication.status)}">${foundApplication.status}</span></p>
+                `;
+            } else {
+                resultsContent.innerHTML = `<p class="text-sm text-gray-500">No application found for "${searchInput.value}".</p>`;
+            }
+
+            searchResults.classList.remove('hidden');
+        }
+
+        function getStatusColor(status) {
+            switch (status) {
+                case 'selected':
+                    return 'green-600';
+                case 'rejected':
+                    return 'red-600';
+                case 'applied':
+                    return 'yellow-600';
+                default:
+                    return 'gray-600';
+            }
+        }
+        
+        function openProfileModal(studentId) {
+            const student = students.find(s => s.id === studentId);
+            if (!student) return;
+
+            modalStudentName.textContent = student.name;
+            modalStudentAge.textContent = student.age;
+            modalStudentCGPA.textContent = student.cgpa;
+            modalStudentATS.textContent = `${student.atsScore}%`;
+            modalStudentCerts.textContent = student.certs;
+            modalResumeContent.textContent = student.resumeText;
+            
+            profileModal.classList.remove('hidden');
+            profileModal.classList.add('flex');
+        }
+
+        function closeProfileModal() {
+            profileModal.classList.add('hidden');
+            profileModal.classList.remove('flex');
+        }
+        
+        function openInternshipModal(internshipId) {
+            const internship = internships.find(i => i.id === internshipId);
+            if (!internship) return;
+            
+            modalInternshipTitle.textContent = internship.title;
+            modalInternshipCompany.textContent = internship.company;
+            modalInternshipDescription.textContent = internship.description;
+            
+            internshipModal.classList.remove('hidden');
+            internshipModal.classList.add('flex');
+        }
+        
+        function closeInternshipModal() {
+            internshipModal.classList.add('hidden');
+            internshipModal.classList.remove('flex');
+        }
+
+        function openApplicationsModal(internshipId, statusFilter) {
+            const internship = internships.find(i => i.id === internshipId);
+            if (!internship) return;
+            
+            const filteredApplications = applications.filter(app => 
+                app.internshipId === internship.id && (statusFilter === 'all' || app.status === statusFilter)
+            );
+            
+            const statusTitles = {
+                'all': 'Total Applicants',
+                'selected': 'Selected Applicants',
+                'rejected': 'Rejected Applicants',
+                'applied': 'In Progress Applicants'
+            };
+            
+            applicationsModalTitle.textContent = `${internship.title}`;
+            applicationsModalSubtitle.textContent = statusTitles[statusFilter] || 'Applications';
+            
+            applicationsModalTableBody.innerHTML = '';
+            filteredApplications.forEach(app => {
+                const student = students.find(s => s.id === app.studentId);
+                if (!student) return;
+                
+                const row = document.createElement('tr');
+                row.className = 'bg-white border-b hover:bg-gray-50';
+                
+                let statusClass = '';
+                if (app.status === 'selected') {
+                    statusClass = 'text-green-600';
+                } else if (app.status === 'rejected') {
+                    statusClass = 'text-red-600';
+                }
+                 else if (app.status === 'applied') {
+                    statusClass = 'text-yellow-600';
+                }
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 font-medium text-gray-900">${student.name}</td>
+                    <td class="px-6 py-4 font-medium text-gray-900">${app.applicationId}</td>
+                    <td class="px-6 py-4">${app.appliedDate}</td>
+                    <td class="px-6 py-4 font-semibold ${statusClass}">${app.status}</td>
+                `;
+                applicationsModalTableBody.appendChild(row);
+            });
+
+            applicationsModal.classList.remove('hidden');
+            applicationsModal.classList.add('flex');
+        }
+
+        function closeApplicationsModal() {
+            applicationsModal.classList.add('hidden');
+            applicationsModal.classList.remove('flex');
+        }
+
+        // --- EVENT LISTENERS ---
+        document.addEventListener('DOMContentLoaded', () => {
+            updateDashboardStats();
+            populateInternshipsTable();
+        });
+
+        internshipsTableBody.addEventListener('click', (e) => {
+            const target = e.target.closest('.applications-count');
+            if (target) {
+                e.preventDefault();
+                const internshipId = target.dataset.id;
+                const statusFilter = target.dataset.filter;
+                openApplicationsModal(internshipId, statusFilter);
+            }
+            if (e.target.classList.contains('view-internship-btn')) {
+                e.preventDefault();
+                const internshipId = e.target.dataset.id;
+                openInternshipModal(internshipId);
+            }
+        });
+
+        searchBtn.addEventListener('click', handleSearch);
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleSearch();
+            }
+        });
+
+        closeProfileModalBtn.addEventListener('click', closeProfileModal);
+        profileModal.addEventListener('click', (e) => {
+            if (e.target === profileModal) {
+                closeProfileModal();
+            }
+        });
+        
+        closeInternshipModalBtn.addEventListener('click', closeInternshipModal);
+        internshipModal.addEventListener('click', (e) => {
+            if (e.target === internshipModal) {
+                closeInternshipModal();
+            }
+        });
+
+        closeApplicationsModalBtn.addEventListener('click', closeApplicationsModal);
+        applicationsModal.addEventListener('click', (e) => {
+            if (e.target === applicationsModal) {
+                closeApplicationsModal();
+            }
+        });
+    </script>
+</body>
+</html>

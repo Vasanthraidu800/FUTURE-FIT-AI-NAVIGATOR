@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Future Fit Navigator</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'linkedin-blue': '#0A66C2',
+                        'linkedin-bg': '#F3F2EF',
+                        'linkedin-text-secondary': 'rgba(0, 0, 0, 0.6)',
+                        'google-blue': '#4285F4',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .google-btn {
+            background-color: white;
+            color: #4285F4;
+            border: 1px solid #dadce0;
+        }
+        .google-btn:hover {
+            background-color: #f8f9fa;
+        }
+        .work-status-card {
+            border: 1px solid #e5e7eb;
+        }
+        .work-status-card.active {
+            border-color: #0A66C2;
+            box-shadow: 0 0 0 2px #0A66C2;
+        }
+    </style>
+</head>
+<body class="bg-linkedin-bg font-sans flex items-center justify-center min-h-screen">
+
+    <div class="w-full max-w-2xl bg-white rounded-lg shadow-md p-8 m-4 grid md:grid-cols-2 gap-8">
+        <!-- Left Section - Illustration & Info -->
+        <div class="hidden md:flex flex-col items-center justify-center p-4 bg-gray-50 rounded-lg">
+            <!-- Illustration for Future Fit Navigator -->
+            <svg class="w-48 h-48 mb-4" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Person walking towards a goal -->
+                <path d="M125 140 C125 130, 115 125, 110 120 C105 115, 100 110, 100 100 C100 90, 105 85, 110 80 C115 75, 125 70, 125 60 L125 50" stroke="#3B82F6" stroke-width="6" stroke-linecap="round"/>
+                <circle cx="125" cy="50" r="7" fill="#3B82F6"/>
+
+                <!-- Compass -->
+                <circle cx="55" cy="145" r="30" stroke="#6B7280" stroke-width="4" fill="#E5E7EB"/>
+                <line x1="55" y1="115" x2="55" y2="145" stroke="#D1D5DB" stroke-width="2"/>
+                <line x1="55" y1="145" x2="80" y2="155" stroke="#D1D5DB" stroke-width="2"/>
+                <path d="M55 145 L55 115 L65 145 Z" fill="#EF4444"/>
+                <path d="M55 145 L55 115 L45 145 Z" fill="#9CA3AF"/>
+
+                <!-- Path/Direction -->
+                <path d="M70 145 L90 135 L105 120" stroke="#3B82F6" stroke-dasharray="8 4" stroke-width="2"/>
+
+                <!-- Stars/Success Markers -->
+                <path d="M140 30 L145 45 L160 47 L148 58 L150 73 L135 65 L120 73 L122 58 L110 47 L125 45 Z" fill="#FBBF24"/>
+                <path d="M165 90 L170 105 L185 107 L173 118 L175 133 L160 125 L145 133 L147 118 L135 107 L150 105 Z" fill="#FBBF24"/>
+            </svg>
+            <h2 class="text-xl font-bold mb-2 text-center">On registering, you can</h2>
+            <ul class="text-sm text-gray-600 space-y-2">
+                <li class="flex items-center space-x-2">
+                    <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Build your profile and let recruiters find you</span>
+                </li>
+                <li class="flex items-center space-x-2">
+                    <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Get job postings delivered right to your email</span>
+                </li>
+                <li class="flex items-center space-x-2">
+                    <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Find a job and grow your career</span>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Right Section - Registration Form -->
+        <div class="flex flex-col">
+            <h1 class="font-bold text-2xl text-center mb-6">Create your account</h1>
+            
+            <!-- Continue with Google -->
+            <button type="button" id="googleRegisterBtn" class="google-btn w-full font-semibold py-3 px-8 rounded-lg transition duration-300 flex items-center justify-center space-x-2 mb-4">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M22.56 12.28c0-.78-.07-1.54-.18-2.28H12v4.26h6.08c-.26 1.4-1.04 2.56-2.21 3.34v2.93h2.15c1.26-1.18 2.06-2.92 2.06-4.95z" fill="#4285F4"/>
+                    <path d="M12 23c3.09 0 5.67-1.02 7.56-2.77l-2.15-2.93c-1.17.78-2.65 1.25-4.41 1.25-3.46 0-6.4-2.34-7.46-5.51H2.57v2.93C4.24 20.25 7.82 23 12 23z" fill="#34A853"/>
+                    <path d="M4.54 14.17c-.52-1.55-.52-3.23 0-4.78V6.46H2.57c-1.74 3.46-1.74 7.54 0 11z" fill="#FBBC05"/>
+                    <path d="M12 3.66c1.69 0 3.23.58 4.41 1.76l1.9-1.9C16.67 1.11 14.09 0 12 0 7.82 0 4.24 2.75 2.57 6.46h1.97C5.6 3.49 8.54 1.15 12 1.15z" fill="#EA4335"/>
+                </svg>
+                <span>Continue with Google</span>
+            </button>
+
+            <!-- OR separator -->
+            <div class="flex items-center my-4">
+                <div class="flex-grow border-t border-gray-300"></div>
+                <span class="flex-shrink mx-4 text-gray-500 text-sm">OR</span>
+                <div class="flex-grow border-t border-gray-300"></div>
+            </div>
+
+            <!-- Registration Form -->
+            <form id="registerForm">
+                <div class="mb-4">
+                    <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1">
+                        Full name <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" id="fullName" required class="w-full bg-gray-100 rounded-md px-3 py-2.5 text-md focus:outline-none focus:ring-2 focus:ring-linkedin-blue" placeholder="What is your name?">
+                </div>
+                
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+                        Email ID <span class="text-red-500">*</span>
+                    </label>
+                    <input type="email" id="email" required class="w-full bg-gray-100 rounded-md px-3 py-2.5 text-md focus:outline-none focus:ring-2 focus:ring-linkedin-blue" placeholder="Tell us your Email ID">
+                </div>
+                
+                <div class="mb-4">
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">
+                        Password <span class="text-red-500">*</span>
+                    </label>
+                    <input type="password" id="password" required class="w-full bg-gray-100 rounded-md px-3 py-2.5 text-md focus:outline-none focus:ring-2 focus:ring-linkedin-blue" placeholder="(Minimum 6 characters)">
+                </div>
+
+                <div class="mb-4">
+                    <label for="mobileNumber" class="block text-sm font-medium text-gray-700 mb-1">
+                        Mobile number <span class="text-red-500">*</span>
+                    </label>
+                    <div class="flex">
+                        <span class="inline-flex items-center px-3 text-gray-500 bg-gray-100 border border-r-0 border-gray-300 rounded-l-md text-sm">
+                            +91
+                        </span>
+                        <input type="tel" id="mobileNumber" required class="w-full bg-gray-100 rounded-r-md px-3 py-2.5 text-md focus:outline-none focus:ring-2 focus:ring-linkedin-blue" placeholder="Enter your mobile number">
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <span class="block text-sm font-medium text-gray-700 mb-2">
+                        Work status <span class="text-red-500">*</span>
+                    </span>
+                    <div class="flex space-x-4">
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="workStatus" value="experienced" class="hidden peer">
+                            <div class="work-status-card p-4 rounded-lg text-center transition-all peer-checked:bg-blue-50 peer-checked:active">
+                                <span class="block font-semibold">I'm experienced</span>
+                                <span class="block text-xs text-gray-500 mt-1">I have work experience (excluding internships)</span>
+                            </div>
+                        </label>
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="workStatus" value="fresher" class="hidden peer" checked>
+                            <div class="work-status-card p-4 rounded-lg text-center transition-all peer-checked:bg-blue-50 peer-checked:active">
+                                <span class="block font-semibold">I'm a fresher</span>
+                                <span class="block text-xs text-gray-500 mt-1">I am a student/Haven't worked after graduation</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <label class="inline-flex items-center cursor-pointer">
+                        <input type="checkbox" class="form-checkbox text-linkedin-blue rounded-full">
+                        <span class="ml-2 text-sm text-gray-600">Send me important updates & promotions via SMS, email, and WhatsApp</span>
+                    </label>
+                </div>
+                
+                <p class="text-xs text-gray-500 text-center mb-4">
+                    By clicking Register, you agree to the <a href="#" class="text-linkedin-blue hover:underline">Terms and Conditions</a> & <a href="#" class="text-linkedin-blue hover:underline">Privacy Policy</a>.
+                </p>
+
+                <button type="submit" class="w-full bg-linkedin-blue text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition duration-300">Register now</button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Placeholder functionality for radio buttons and form submission
+        const registerForm = document.getElementById('registerForm');
+        const workStatusOptions = document.querySelectorAll('input[name="workStatus"]');
+
+        workStatusOptions.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                document.querySelectorAll('.work-status-card').forEach(card => {
+                    card.classList.remove('active');
+                });
+                if (e.target.checked) {
+                    e.target.closest('label').querySelector('.work-status-card').classList.add('active');
+                }
+            });
+        });
+
+        registerForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // In a real app, this would send data to a backend for user creation.
+            // For this demo, we store credentials and redirect to login.
+            const newUser = { email, password };
+            sessionStorage.setItem('newUser', JSON.stringify(newUser));
+            
+            // Redirect to the login page
+            window.location.href = 'index.html';
+        });
+
+        // Placeholder for Google login
+        document.getElementById('googleRegisterBtn').addEventListener('click', () => {
+            alert('Google login functionality would be implemented here.');
+        });
+    </script>
+</body>
+</html>
